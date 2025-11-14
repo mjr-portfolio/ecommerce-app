@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 function Profile({ user, setUser }) {
     const [loading, setLoading] = useState(false)
@@ -10,21 +10,20 @@ function Profile({ user, setUser }) {
     const handleLogout = async () => {
         setLoading(true)
         try {
-            const response = await fetch('/auth/logout', {
+            const response = await fetch('/api/auth/logout', {
                 method: 'POST',
                 credentials: 'include',
             })
 
             const data = await response.json()
 
-            if (response.ok) {
-                setUser(null)
-                navigate('/login')
-            } else {
-                setError(data.error || 'Failed to log out.')
-            }
+            if (!response.ok)
+                throw new Error(data.error || 'Failed to log out.')
+
+            setUser(null)
+            navigate('/login')
         } catch (err) {
-            setError('Network error during logout.')
+            setError(err.message || 'Network error during logout.')
         } finally {
             setLoading(false)
         }
@@ -50,13 +49,20 @@ function Profile({ user, setUser }) {
             <p>You are logged in as {user.email}</p>
             <p>Name: {user.name}</p>
             <p>Account created: {new Date(user.created_at).toLocaleString()}</p>
-            <button
-                onClick={handleLogout}
-                disabled={loading}
-                style={{ marginTop: 20 }}
-            >
-                {loading ? 'Logging out...' : 'Logout'}
-            </button>
+            <div style={{ marginTop: '20px' }}>
+                <Link to="/orders">
+                    <button>View My Orders</button>
+                </Link>
+            </div>
+            <div style={{ marginTop: '20px' }}>
+                <button
+                    onClick={handleLogout}
+                    disabled={loading}
+                    style={{ marginTop: 20 }}
+                >
+                    {loading ? 'Logging out...' : 'Logout'}
+                </button>
+            </div>
         </div>
     )
 }

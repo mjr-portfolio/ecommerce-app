@@ -1,20 +1,41 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { useEffect, useState, useRef } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
-function Login({ onLoginSuccess }) {
+function Login({ onLoginSuccess, user }) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [message, setMessage] = useState('')
     const [loading, setLoading] = useState(false)
 
+    const location = useLocation()
     const navigate = useNavigate()
+    const firstRender = useRef(true)
+    const loggingIn = useRef(false)
+
+    // Read the ?next= value from the URL
+    const searchParams = new URLSearchParams(location.search)
+    const redirectTo = searchParams.get('next') || '/profile'
+
+    // 1️⃣ Redirect if visiting login page while already logged in
+    useEffect(() => {
+        if (firstRender.current) {
+            firstRender.current = false
+            return
+        }
+
+        if (loggingIn.current) return
+
+        if (user) {
+            navigate('/profile')
+        }
+    }, [user])
 
     const handleLogin = async e => {
         e.preventDefault()
         setLoading(true)
 
         try {
-            const response = await fetch('/auth/login', {
+            const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include', // important for Flask-Login sessions
@@ -23,15 +44,15 @@ function Login({ onLoginSuccess }) {
 
             const data = await response.json()
 
-            if (response.ok) {
-                onLoginSuccess(data.user) // Passes user data to App.jsx so it can be used throughout the app
-                navigate('/profile')
-                setMessage(`Logged in successfully as ${data.message}`)
-            } else {
-                setMessage(data.error || 'Login failed')
-            }
+            // Check for failed response before parsing JSON
+            if (!response.ok) throw new Error(data.error || 'Login failed')
+
+            loggingIn.current = true
+            onLoginSuccess(data.user) // Passes user data to App.jsx so it can be used throughout the app
+            navigate(redirectTo)
+            setMessage(`Logged in successfully as ${data.user.name || 'user'}`)
         } catch (err) {
-            setMessage('Network error')
+            setMessage(err.message || 'Network error')
         } finally {
             setLoading(false)
         }

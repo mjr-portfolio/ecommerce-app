@@ -1,15 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
+
 import Login from './pages/login'
 import Register from './pages/register'
 import Profile from './pages/profile'
-import './App.css'
+import Products from './pages/products'
+import ProductDetail from './pages/productDetail'
+import Cart from './pages/cart'
+import Checkout from './pages/checkout'
+import OrderComplete from './pages/orderComplete'
+import Orders from './pages/orders'
+import OrderDetail from './pages/orderDetail'
+import Home from './pages/home'
 
-function ProtectedRoute({ user, children }) {
-    // If not logged in, redirect to login
-    if (!user) return <Navigate to="/login" replace />
-    return children
-}
+import Navbar from './components/navbar'
+import ProtectedRoute from './components/protectedRoute'
+
+import './App.css'
 
 function App() {
     const [user, setUser] = useState(() => {
@@ -28,19 +35,17 @@ function App() {
     useEffect(() => {
         const checkSession = async () => {
             try {
-                const response = await fetch('/auth/me', {
+                const response = await fetch('/api/auth/me', {
                     credentials: 'include',
                 })
 
                 const data = await response.json()
 
                 // Assuming consistent API contract — backend returns { user: {...} } and good backend test coverage
-                if (response.ok) {
-                    setUser(data.user) // restore user from backend session
-                } else {
-                    setUser(null)
-                    localStorage.removeItem('user')
-                }
+                if (!response.ok)
+                    throw new Error(data.error || 'Failed to fetch user data')
+
+                setUser(data.user) // restore user from backend session
             } catch (err) {
                 // No active session found; cleared user from state and localStorage
                 setUser(null)
@@ -55,30 +60,31 @@ function App() {
 
     return (
         <>
+            <Navbar user={user} />
             <Routes>
+                <Route path="/" element={<Home user={user} />} />
                 <Route
                     path="/login"
                     element={
-                        user ? (
-                            <Navigate to="/profile" replace />
-                        ) : (
-                            <Login
-                                onLoginSuccess={userData => setUser(userData)}
-                            />
-                        )
+                        <Login
+                            onLoginSuccess={userData => setUser(userData)}
+                            user={user}
+                        />
                     }
                 />
                 <Route
                     path="/register"
                     element={
-                        user ? (
-                            <Navigate to="/profile" replace />
-                        ) : (
-                            <Register
-                                onLoginSuccess={userData => setUser(userData)}
-                            />
-                        )
+                        <Register
+                            onLoginSuccess={userData => setUser(userData)}
+                            user={user}
+                        />
                     }
+                />
+                <Route path="/products" element={<Products />} />
+                <Route
+                    path="/products/:id"
+                    element={<ProductDetail user={user} />}
                 />
                 <Route
                     path="/profile"
@@ -88,13 +94,48 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
-                {/* Default route */}
                 <Route
-                    path="*"
+                    path="/cart/"
                     element={
-                        <Navigate to={user ? '/profile' : '/login'} replace />
+                        <ProtectedRoute user={user}>
+                            <Cart />
+                        </ProtectedRoute>
                     }
                 />
+                <Route
+                    path="/checkout"
+                    element={
+                        <ProtectedRoute user={user}>
+                            <Checkout />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/order-complete"
+                    element={
+                        <ProtectedRoute user={user}>
+                            <OrderComplete />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/orders"
+                    element={
+                        <ProtectedRoute user={user}>
+                            <Orders />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/orders/:id"
+                    element={
+                        <ProtectedRoute user={user}>
+                            <OrderDetail />
+                        </ProtectedRoute>
+                    }
+                />
+                {/* Default route */}
+                <Route path="*" element={<Home />} />
             </Routes>
 
             {/* Overlay spinner while checking session */}

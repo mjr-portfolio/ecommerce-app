@@ -1,21 +1,41 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { useEffect, useState, useRef } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
-function Register({ onLoginSuccess }) {
+function Register({ onLoginSuccess, user }) {
     const [email, setEmail] = useState('')
     const [name, setName] = useState('')
     const [password, setPassword] = useState('')
     const [message, setMessage] = useState('')
     const [loading, setLoading] = useState(false)
 
+    const location = useLocation()
     const navigate = useNavigate()
+    const firstRender = useRef(true)
+    const registering = useRef(false)
+
+    const searchParams = new URLSearchParams(location.search)
+    const redirectTo = searchParams.get('next') || '/profile'
+
+    // 1️⃣ Redirect if visiting login page while already logged in
+    useEffect(() => {
+        if (firstRender.current) {
+            firstRender.current = false
+            return
+        }
+
+        if (registering.current) return
+
+        if (user) {
+            navigate('/profile')
+        }
+    }, [user])
 
     const handleRegister = async e => {
         e.preventDefault()
         setLoading(true)
 
         try {
-            const response = await fetch('/auth/register', {
+            const response = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, name, password }),
@@ -23,14 +43,14 @@ function Register({ onLoginSuccess }) {
 
             const data = await response.json()
 
-            if (response.ok) {
-                onLoginSuccess(data.user) // Passes user data to App.jsx so it can be used throughout the app
-                navigate('/profile')
-            } else {
-                setMessage(data.error || 'User registration failed')
-            }
+            if (!response.ok)
+                throw new Error(data.error || 'User registration failed')
+
+            registering.current = true
+            onLoginSuccess(data.user) // Passes user data to App.jsx so it can be used throughout the app
+            navigate(redirectTo)
         } catch (err) {
-            setMessage('Network error')
+            setMessage(err.message || 'Network error')
         } finally {
             setLoading(false)
         }

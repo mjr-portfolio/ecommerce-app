@@ -27,11 +27,21 @@ class Product(db.Model):
     price = db.Column(db.Float, nullable=False)
     stock = db.Column(db.Integer, nullable=False, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     order_items = db.relationship("OrderItem", back_populates="product")
 
     def __repr__(self):
         return f"<Product {self.name}>"
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'price': self.price,
+            'stock': self.stock
+        }
 
 # Order model
 class Order(db.Model):
@@ -47,6 +57,15 @@ class Order(db.Model):
 
     def __repr__(self):
         return f"<Order {self.id} by User {self.user_id}>"
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "status": self.status,
+            "created_at": self.created_at.isoformat(),
+            "items": [item.to_dict() for item in self.items]
+        }
 
 # OrderItem model
 class OrderItem(db.Model):
@@ -63,4 +82,58 @@ class OrderItem(db.Model):
 
     def __repr__(self):
         return f"<OrderItem {self.quantity}x {self.product_id} in Order {self.order_id}>"
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "product": self.product.to_dict(),
+            "quantity": self.quantity,
+            "price": self.price
+        }
 
+
+class Cart(db.Model):
+    __tablename__ = "carts"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    status = db.Column(db.String(20), default="open")  # open or checked_out
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    items = db.relationship("CartItem", back_populates="cart", cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f"<Cart {self.id} by User {self.user_id}>"
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "status": self.status,
+            "created_at": self.created_at.isoformat(),
+            "items": [item.to_dict() for item in self.items]
+        }
+
+
+class CartItem(db.Model):
+    __tablename__ = "cart_items"
+
+    id = db.Column(db.Integer, primary_key=True)
+    cart_id = db.Column(db.Integer, db.ForeignKey("carts.id"), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False, default=1)
+    price = db.Column(db.Float, nullable=False)  # snapshot of price at add time
+
+    cart = db.relationship("Cart", back_populates="items")
+    product = db.relationship("Product")
+
+    def __repr__(self):
+        return f"<CartItem {self.quantity}x {self.product_id} in Cart {self.cart_id}>"
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "product": self.product.to_dict(),
+            "quantity": self.quantity,
+            "price": self.price
+        }
