@@ -1,29 +1,35 @@
+import { ThemeProvider } from 'styled-components'
+import { lightTheme, darkTheme } from './theme/theme'
+import { GlobalStyles } from './theme/globalStyles'
 import React, { useEffect, useState } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
-import Login from './pages/login'
-import Register from './pages/register'
-import Profile from './pages/profile'
-import Products from './pages/products'
-import ProductDetail from './pages/productDetail'
+import Login from './pages/Login'
+import Register from './pages/Register'
+import Profile from './pages/Profile'
+import Products from './pages/Products'
+import ProductDetail from './pages/ProductDetail'
 import Cart from './pages/cart'
 import Checkout from './pages/checkout'
-import OrderComplete from './pages/orderComplete'
-import Orders from './pages/orders'
-import OrderDetail from './pages/orderDetail'
-import Home from './pages/home'
+import OrderComplete from './pages/OrderComplete'
+import Orders from './pages/Orders'
+import OrderDetail from './pages/OrderDetail'
+import Home from './pages/Home'
 
-import Navbar from './components/navbar'
-import ProtectedRoute from './components/protectedRoute'
-
-import './App.css'
+import MessageContainer from './components/ui/MessageContainer'
+import Navbar from './components/Navbar'
+import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
+    const storedTheme = localStorage.getItem('themeMode')
+    const [theme, setTheme] = useState(
+        storedTheme === 'dark' ? darkTheme : lightTheme
+    )
     const [user, setUser] = useState(() => {
         const storedUser = localStorage.getItem('user')
         return storedUser ? JSON.parse(storedUser) : null
     })
-    const [checkingSession, setCheckingSession] = useState(true) // <-- loading state for session check
+    const [checkingSession, setCheckingSession] = useState(true)
 
     // Keeps localStorage in sync with user state
     useEffect(() => {
@@ -47,7 +53,7 @@ function App() {
 
                 setUser(data.user) // restore user from backend session
             } catch (err) {
-                // No active session found; cleared user from state and localStorage
+                // No active session found, cleared user from state and localStorage
                 setUser(null)
                 localStorage.removeItem('user')
             } finally {
@@ -58,9 +64,18 @@ function App() {
         else setCheckingSession(false)
     }, [])
 
+    const toggleTheme = () => {
+        setTheme(prev => {
+            const next = prev.mode === 'light' ? darkTheme : lightTheme
+            localStorage.setItem('themeMode', next.mode)
+            return next
+        })
+    }
+
     return (
-        <>
-            <Navbar user={user} />
+        <ThemeProvider theme={theme}>
+            <GlobalStyles />
+            <Navbar user={user} toggleTheme={toggleTheme} theme={theme} />
             <Routes>
                 <Route path="/" element={<Home user={user} />} />
                 <Route
@@ -138,13 +153,12 @@ function App() {
                 <Route path="*" element={<Home />} />
             </Routes>
 
-            {/* Overlay spinner while checking session */}
             {checkingSession && (
-                <div className="overlay">
-                    <div className="spinner"></div>
-                </div>
+                <MessageContainer>
+                    <p>Checking session…</p>
+                </MessageContainer>
             )}
-        </>
+        </ThemeProvider>
     )
 }
 

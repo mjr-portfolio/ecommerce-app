@@ -1,10 +1,25 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
+import Container from '../components/Container'
+import PageHeader from '../components/ui/PageHeader'
+import Section from '../components/ui/Section'
+import Button from '../components/ui/Button'
+import MessageContainer from '../components/ui/MessageContainer'
+import ErrorMessage from '../components/ui/ErrorMessage'
+import {
+    OrderCard,
+    OrderHeader,
+    OrderId,
+    OrderStatus,
+    OrderMeta,
+    OrderFooter,
+} from '../components/ui/OrderCard'
+
 function Orders() {
     const [orders, setOrders] = useState([])
     const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(null)
+    const [error, setError] = useState('')
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -28,53 +43,57 @@ function Orders() {
         fetchOrders()
     }, [])
 
-    if (loading) return <p>Loading orders...</p>
+    const renderOrderList = () =>
+        orders.map(order => {
+            const itemCount = order.items.reduce(
+                (sum, item) => sum + item.quantity,
+                0
+            )
 
-    if (error) return <p style={{ color: 'red' }}>Error: {error}</p>
+            return (
+                <OrderCard key={order.id}>
+                    <OrderHeader>
+                        <OrderId>Order #{order.id}</OrderId>
+                        <OrderStatus>Status: {order.status}</OrderStatus>
+                    </OrderHeader>
 
-    if (orders.length === 0)
-        return (
-            <div>
-                <h2>Your Orders</h2>
-                <p>You haven't placed any orders yet.</p>
-                <Link to="/products">
-                    <button>Start Shopping</button>
-                </Link>
-            </div>
-        )
+                    <OrderMeta>
+                        Date: {new Date(order.created_at).toLocaleString()}
+                        <br />
+                        Total Items: {itemCount}
+                    </OrderMeta>
+
+                    <OrderFooter>
+                        <Link to={`/orders/${order.id}`}>
+                            <Button>View Details</Button>
+                        </Link>
+                    </OrderFooter>
+                </OrderCard>
+            )
+        })
 
     return (
-        <div>
-            <h2>Your Orders</h2>
+        <Container>
+            <PageHeader>Your Orders</PageHeader>
 
-            {orders.map(order => (
-                <div
-                    key={order.id}
-                    style={{
-                        border: '1px solid #ddd',
-                        padding: '15px',
-                        marginBottom: '15px',
-                        borderRadius: '6px',
-                    }}
-                >
-                    <h3>Order #{order.id}</h3>
-                    <p>Status: {order.status}</p>
-                    <p>Date: {new Date(order.created_at).toLocaleString()}</p>
+            <MessageContainer>
+                {loading && <p>Loading orders...</p>}
+                {error && <ErrorMessage>{error}</ErrorMessage>}
+            </MessageContainer>
 
-                    <p>
-                        Total Items:{' '}
-                        {order.items.reduce(
-                            (sum, item) => sum + item.quantity,
-                            0
-                        )}
-                    </p>
-
-                    <Link to={`/orders/${order.id}`}>
-                        <button>View Details</button>
+            {!loading && !error && orders.length === 0 && (
+                <Section size="lg">
+                    <p>You haven’t placed any orders yet.</p>
+                    <Link to="/products">
+                        <Button>Start Shopping</Button>
                     </Link>
-                </div>
-            ))}
-        </div>
+                </Section>
+            )}
+
+            {!loading && !error && orders.length > 0 && (
+                <Section size="lg">{renderOrderList()}</Section>
+            )}
+        </Container>
     )
 }
 

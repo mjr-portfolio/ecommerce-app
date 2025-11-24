@@ -1,22 +1,38 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 
+import Container from '../components/Container'
+import PageHeader from '../components/ui/PageHeader'
+import MessageContainer from '../components/ui/MessageContainer'
+import ErrorMessage from '../components/ui/ErrorMessage'
+import Button from '../components/ui/Button'
+import TextCenter from '../components/ui/TextCenter'
+
+import {
+    Form,
+    FormRow,
+    FormLabel,
+    FormInput,
+    FormActions,
+} from '../components/ui/Form'
+import Section from '../components/ui/Section'
+
 function Login({ onLoginSuccess, user }) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [message, setMessage] = useState('')
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
 
     const location = useLocation()
     const navigate = useNavigate()
+
+    // Avoid redirect loop
     const firstRender = useRef(true)
     const loggingIn = useRef(false)
 
-    // Read the ?next= value from the URL
     const searchParams = new URLSearchParams(location.search)
-    const redirectTo = searchParams.get('next') || '/profile'
+    const redirectTo = searchParams.get('next') || '/'
 
-    // 1️⃣ Redirect if visiting login page while already logged in
     useEffect(() => {
         if (firstRender.current) {
             firstRender.current = false
@@ -25,78 +41,84 @@ function Login({ onLoginSuccess, user }) {
 
         if (loggingIn.current) return
 
-        if (user) {
-            navigate('/profile')
-        }
+        if (user) navigate('/profile')
     }, [user])
 
     const handleLogin = async e => {
         e.preventDefault()
         setLoading(true)
+        // Reset messages after previous use
+        setError('')
 
         try {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                credentials: 'include', // important for Flask-Login sessions
+                credentials: 'include',
                 body: JSON.stringify({ email, password }),
             })
 
             const data = await response.json()
 
-            // Check for failed response before parsing JSON
             if (!response.ok) throw new Error(data.error || 'Login failed')
 
             loggingIn.current = true
-            onLoginSuccess(data.user) // Passes user data to App.jsx so it can be used throughout the app
+            onLoginSuccess(data.user)
+
             navigate(redirectTo)
-            setMessage(`Logged in successfully as ${data.user.name || 'user'}`)
         } catch (err) {
-            setMessage(err.message || 'Network error')
+            setError(err.message || 'Network error')
         } finally {
             setLoading(false)
         }
     }
 
     return (
-        <div
-            style={{ maxWidth: 400, margin: '50px auto', textAlign: 'center' }}
-        >
-            <h2>Login</h2>
-            <form onSubmit={handleLogin}>
-                <div>
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        required
-                        style={{ width: '100%', marginBottom: 10, padding: 8 }}
-                    />
-                </div>
-                <div>
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={e => setPassword(e.target.value)}
-                        required
-                        style={{ width: '100%', marginBottom: 10, padding: 8 }}
-                    />
-                </div>
-                <button
-                    type="submit"
-                    disabled={loading}
-                    style={{ padding: 8, width: '100%' }}
-                >
-                    {loading ? 'Logging in...' : 'Login'}
-                </button>
-            </form>
-            <p>
-                Don’t have an account? <Link to="/register">Register here</Link>
-            </p>
-            {message && <p>{message}</p>}
-        </div>
+        <Container>
+            <PageHeader>Login</PageHeader>
+
+            <MessageContainer>
+                {loading && <p>Loading...</p>}
+                {error && <ErrorMessage>{error}</ErrorMessage>}
+            </MessageContainer>
+
+            {!loading && !error && (
+                <Section>
+                    <Form onSubmit={handleLogin}>
+                        <FormRow>
+                            <FormLabel>Email</FormLabel>
+                            <FormInput
+                                type="email"
+                                value={email}
+                                onChange={e => setEmail(e.target.value)}
+                                required
+                            />
+                        </FormRow>
+
+                        <FormRow>
+                            <FormLabel>Password</FormLabel>
+                            <FormInput
+                                type="password"
+                                value={password}
+                                onChange={e => setPassword(e.target.value)}
+                                required
+                            />
+                        </FormRow>
+
+                        <FormActions>
+                            <Button type="submit" disabled={loading} fullwidth>
+                                {loading ? 'Logging in...' : 'Login'}
+                            </Button>
+                        </FormActions>
+
+                        <TextCenter>
+                            Don’t have an account?{' '}
+                            <Link to="/register">Register here</Link>
+                        </TextCenter>
+                    </Form>
+                </Section>
+            )}
+        </Container>
     )
 }
 

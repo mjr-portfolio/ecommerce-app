@@ -1,43 +1,55 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+
+import useIsMobile from '../hook/useIsMobile'
+
+import Container from '../components/Container'
+import PageHeader from '../components/ui/PageHeader'
+import Section from '../components/ui/Section'
+import MessageContainer from '../components/ui/MessageContainer'
+import ErrorMessage from '../components/ui/ErrorMessage'
+import Button from '../components/ui/Button'
+import ButtonRow from '../components/ui/ButtonRow'
+import TextCenter from '../components/ui/TextCenter'
+
+import CartItemRow from '../components/cart/CartItemRow'
+import OrderTotals from '../components/orders/OrderTotals'
 
 function Cart() {
     const [cart, setCart] = useState(null)
     const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(null)
-    const navigate = useNavigate()
+    const [error, setError] = useState('')
 
-    // Fetch cart on mount
-    useEffect(() => {
-        const fetchCart = async () => {
-            try {
-                const response = await fetch('/api/cart', {
-                    credentials: 'include',
-                })
+    const isMobile = useIsMobile()
 
-                const data = await response.json()
+    const fetchCart = async () => {
+        try {
+            const response = await fetch('/api/cart', {
+                credentials: 'include',
+            })
 
-                if (!response.ok)
-                    throw new Error(data.error || 'Failed to load cart')
+            const data = await response.json()
+            if (!response.ok)
+                throw new Error(data.error || 'Failed to load cart')
 
-                setCart(data)
-            } catch (err) {
-                setError(err.message)
-            } finally {
-                setLoading(false)
-            }
+            setCart(data)
+        } catch (err) {
+            setError(err.message)
+        } finally {
+            setLoading(false)
         }
+    }
+
+    useEffect(() => {
         fetchCart()
     }, [])
 
-    // Update item quantity
-    const updateQuantity = async (itemId, quantity) => {
-        try {
-            if (quantity < 1) {
-                // Automatically delete item if quantity hits 0
-                return removeItem(itemId)
-            }
+    const increase = item => updateItem(item.id, item.quantity + 1)
+    const decrease = item =>
+        item.quantity > 1 ? updateItem(item.id, item.quantity - 1) : null
 
+    const updateItem = async (itemId, quantity) => {
+        try {
             const response = await fetch(`/api/cart/update/${itemId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -55,10 +67,9 @@ function Cart() {
         }
     }
 
-    // Remove item
-    const removeItem = async itemId => {
+    const removeItem = async item => {
         try {
-            const response = await fetch(`/api/cart/remove/${itemId}`, {
+            const response = await fetch(`/api/cart/remove/${item.id}`, {
                 method: 'DELETE',
                 credentials: 'include',
             })
@@ -73,7 +84,6 @@ function Cart() {
         }
     }
 
-    // Clear entire cart
     const clearCart = async () => {
         try {
             const response = await fetch('/api/cart/clear', {
@@ -85,106 +95,104 @@ function Cart() {
             if (!response.ok)
                 throw new Error(data.error || 'Failed to clear cart')
 
-            // After clearing, re-fetch the updated empty cart
             setCart(prev => ({ ...prev, items: [] }))
         } catch (err) {
             setError(err.message)
         }
     }
 
-    // Navigate to checkout
-    const goToCheckout = () => {
-        navigate('/checkout')
-    }
-
-    // Loading state
-    if (loading) return <p>Loading cart...</p>
-
-    // Error state
-    if (error) return <p style={{ color: 'red' }}>Error: {error}</p>
-
-    // Empty cart
-    if (cart.items.length === 0)
-        return (
-            <div>
-                <h2>Your Cart</h2>
-                <p>Your cart is empty.</p>
-            </div>
-        )
+    const total =
+        cart?.items?.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+        ) || 0
 
     return (
-        <div>
-            <h2>Your Cart</h2>
+        <Container>
+            <PageHeader>Your Cart</PageHeader>
 
-            {cart.items.map(item => (
-                <div
-                    key={item.id}
-                    style={{
-                        borderBottom: '1px solid #ddd',
-                        padding: '10px 0',
-                        marginBottom: '10px',
-                    }}
-                >
-                    <h3>{item.product.name}</h3>
-                    <p>{item.product.description}</p>
-                    <p>Price: £{item.price.toFixed(2)}</p>
+            <MessageContainer>
+                {loading && <p>Loading cart...</p>}
+                {error && <ErrorMessage>{error}</ErrorMessage>}
+            </MessageContainer>
 
-                    <div
-                        style={{
-                            display: 'flex',
-                            gap: '10px',
-                            alignItems: 'center',
-                        }}
-                    >
-                        <button
-                            onClick={() =>
-                                updateQuantity(item.id, item.quantity - 1)
-                            }
-                        >
-                            -
-                        </button>
+            {!loading && !error && cart?.items?.length === 0 && (
+                <Section>
+                    <TextCenter>
+                        <p>Your cart is empty.</p>
+                        <Link to="/products">
+                            <Button>Browse Products</Button>
+                        </Link>
+                    </TextCenter>
+                </Section>
+            )}
 
-                        <span>{item.quantity}</span>
+            {!loading && !error && cart?.items?.length > 0 && (
+                <>
+                    <Section size="lg">
+                        {cart.items.map(item => (
+                            <CartItemRow
+                                key={item.id}
+                                item={item}
+                                onIncrease={increase}
+                                onDecrease={decrease}
+                                onRemove={removeItem}
+                            />
+                        ))}
+                    </Section>
 
-                        <button
-                            onClick={() =>
-                                updateQuantity(item.id, item.quantity + 1)
-                            }
-                        >
-                            +
-                        </button>
-                    </div>
+                    <Section size="lg">
+                        <OrderTotals
+                            subtotal={total}
+                            total={total}
+                            shipping="Free"
+                        />
+                    </Section>
 
-                    <button
-                        style={{ marginTop: '8px' }}
-                        onClick={() => removeItem(item.id)}
-                    >
-                        Remove Item
-                    </button>
-                </div>
-            ))}
+                    <Section size="lg">
+                        {isMobile ? (
+                            <ButtonRow>
+                                <Link to="/checkout">
+                                    <Button fullwidth size="lg">
+                                        Checkout
+                                    </Button>
+                                </Link>
 
-            <hr />
+                                <Link to="/products">
+                                    <Button fullwidth variant="secondary">
+                                        Continue Shopping
+                                    </Button>
+                                </Link>
 
-            <h3>
-                Total: £
-                {cart.items
-                    .reduce((sum, item) => sum + item.price * item.quantity, 0)
-                    .toFixed(2)}
-            </h3>
+                                <Button
+                                    fullwidth
+                                    variant="danger"
+                                    onClick={clearCart}
+                                >
+                                    Clear Cart
+                                </Button>
+                            </ButtonRow>
+                        ) : (
+                            <ButtonRow $justify="end">
+                                <Button variant="danger" onClick={clearCart}>
+                                    Clear Cart
+                                </Button>
 
-            <button style={{ marginRight: '10px' }} onClick={clearCart}>
-                Clear Cart
-            </button>
+                                <Link to="/products">
+                                    <Button variant="secondary">
+                                        Continue Shopping
+                                    </Button>
+                                </Link>
 
-            <button style={{ marginRight: '10px' }} onClick={goToCheckout}>
-                Proceed to Checkout
-            </button>
-
-            <Link to="/products">
-                <button>Continue Shopping</button>
-            </Link>
-        </div>
+                                <Link to="/checkout">
+                                    <Button size="lg">Checkout</Button>
+                                </Link>
+                            </ButtonRow>
+                        )}
+                    </Section>
+                </>
+            )}
+        </Container>
     )
 }
 

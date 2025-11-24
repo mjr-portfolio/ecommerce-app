@@ -1,10 +1,16 @@
 import { Navigate, useLocation } from 'react-router-dom'
 
-function ProtectedRoute({ user, children }) {
+export default function ProtectedRoute({ user, children }) {
     const location = useLocation()
-    const redirectPath = location.pathname + location.search
+
+    // Prevent redirect loop if already on login
+    const isOnLoginPage = location.pathname === '/login'
 
     if (!user) {
+        if (isOnLoginPage) return children //Covers potential login page accidental wrapping
+
+        const redirectPath = location.pathname + location.search
+
         return (
             <Navigate
                 to={`/login?next=${encodeURIComponent(redirectPath)}`}
@@ -12,7 +18,7 @@ function ProtectedRoute({ user, children }) {
             />
         )
     }
+
+    // User exists - allow page
     return children
 }
-
-export default ProtectedRoute

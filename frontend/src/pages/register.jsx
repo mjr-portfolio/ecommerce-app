@@ -1,22 +1,38 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 
+import Container from '../components/Container'
+import PageHeader from '../components/ui/PageHeader'
+import MessageContainer from '../components/ui/MessageContainer'
+import ErrorMessage from '../components/ui/ErrorMessage'
+import Button from '../components/ui/Button'
+import TextCenter from '../components/ui/TextCenter'
+import Section from '../components/ui/Section'
+
+import {
+    Form,
+    FormRow,
+    FormLabel,
+    FormInput,
+    FormActions,
+} from '../components/ui/Form'
+
 function Register({ onLoginSuccess, user }) {
     const [email, setEmail] = useState('')
     const [name, setName] = useState('')
     const [password, setPassword] = useState('')
-    const [message, setMessage] = useState('')
+    const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
 
     const location = useLocation()
     const navigate = useNavigate()
+
     const firstRender = useRef(true)
     const registering = useRef(false)
 
     const searchParams = new URLSearchParams(location.search)
     const redirectTo = searchParams.get('next') || '/profile'
 
-    // 1️⃣ Redirect if visiting login page while already logged in
     useEffect(() => {
         if (firstRender.current) {
             firstRender.current = false
@@ -25,14 +41,13 @@ function Register({ onLoginSuccess, user }) {
 
         if (registering.current) return
 
-        if (user) {
-            navigate('/profile')
-        }
+        if (user) navigate('/profile')
     }, [user])
 
     const handleRegister = async e => {
         e.preventDefault()
         setLoading(true)
+        setError('')
 
         try {
             const response = await fetch('/api/auth/register', {
@@ -44,66 +59,74 @@ function Register({ onLoginSuccess, user }) {
             const data = await response.json()
 
             if (!response.ok)
-                throw new Error(data.error || 'User registration failed')
+                throw new Error(data.error || 'Registration failed')
 
             registering.current = true
-            onLoginSuccess(data.user) // Passes user data to App.jsx so it can be used throughout the app
+            onLoginSuccess(data.user)
             navigate(redirectTo)
         } catch (err) {
-            setMessage(err.message || 'Network error')
+            setError(err.message || 'Network error')
         } finally {
             setLoading(false)
         }
     }
 
     return (
-        <div
-            style={{ maxWidth: 400, margin: '50px auto', textAlign: 'center' }}
-        >
-            <h2>Register</h2>
-            <form onSubmit={handleRegister}>
-                <div>
-                    <input
-                        type="text"
-                        placeholder="Name"
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                        style={{ width: '100%', marginBottom: 10, padding: 8 }}
-                    />
-                </div>
-                <div>
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        required
-                        style={{ width: '100%', marginBottom: 10, padding: 8 }}
-                    />
-                </div>
-                <div>
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={e => setPassword(e.target.value)}
-                        required
-                        style={{ width: '100%', marginBottom: 10, padding: 8 }}
-                    />
-                </div>
-                <button
-                    type="submit"
-                    disabled={loading}
-                    style={{ padding: 8, width: '100%' }}
-                >
-                    {loading ? 'Registering...' : 'Register'}
-                </button>
-            </form>
-            <p>
-                Already have an account? <Link to="/login">Log in here</Link>
-            </p>
-            {message && <p>{message}</p>}
-        </div>
+        <Container>
+            <PageHeader>Register</PageHeader>
+
+            <MessageContainer>
+                {loading && <p>Loading...</p>}
+                {error && <ErrorMessage>{error}</ErrorMessage>}
+            </MessageContainer>
+
+            {!loading && !error && (
+                <Section>
+                    <Form onSubmit={handleRegister}>
+                        <FormRow>
+                            <FormLabel>Name</FormLabel>
+                            <FormInput
+                                type="text"
+                                value={name}
+                                onChange={e => setName(e.target.value)}
+                                required
+                            />
+                        </FormRow>
+
+                        <FormRow>
+                            <FormLabel>Email</FormLabel>
+                            <FormInput
+                                type="email"
+                                value={email}
+                                onChange={e => setEmail(e.target.value)}
+                                required
+                            />
+                        </FormRow>
+
+                        <FormRow>
+                            <FormLabel>Password</FormLabel>
+                            <FormInput
+                                type="password"
+                                value={password}
+                                onChange={e => setPassword(e.target.value)}
+                                required
+                            />
+                        </FormRow>
+
+                        <FormActions>
+                            <Button type="submit" disabled={loading} fullwidth>
+                                {loading ? 'Registering...' : 'Register'}
+                            </Button>
+                        </FormActions>
+
+                        <TextCenter>
+                            Already have an account?{' '}
+                            <Link to="/login">Log in here</Link>
+                        </TextCenter>
+                    </Form>
+                </Section>
+            )}
+        </Container>
     )
 }
 

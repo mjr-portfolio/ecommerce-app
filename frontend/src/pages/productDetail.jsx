@@ -1,12 +1,62 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 
+import { productImages } from '../utils/productImages'
+
+import Container from '../components/Container'
+import { Card, CardBody, CardTitle, CardSeparator } from '../components/ui/Card'
+import Button from '../components/ui/Button'
+import PageHeader from '../components/ui/PageHeader'
+import ErrorMessage from '../components/ui/ErrorMessage'
+import SuccessMessage from '../components/ui/SuccessMessage'
+import MessageContainer from '../components/ui/MessageContainer'
+import Section from '../components/ui/Section'
+
+import styled from 'styled-components'
+
+const ImageWrapper = styled.div`
+    width: 100%;
+    height: ${({ theme }) => theme.imageHeights.productDetail.desktop};
+    border-radius: ${({ theme }) => theme.radius.md};
+    overflow: hidden;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+        height: ${({ theme }) => theme.imageHeights.productDetail.mobile};
+    }
+`
+
+const PriceBox = styled.div`
+    padding: ${({ theme }) => theme.spacing.md};
+    border: 1px solid ${({ theme }) => theme.colors.border};
+    border-radius: ${({ theme }) => theme.radius.md};
+    background: ${({ theme }) => theme.colors.card};
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-align: center;
+    margin: ${({ theme }) => theme.spacing.md} 0;
+`
+
+const Description = styled.p`
+    margin-bottom: ${({ theme }) => theme.spacing.xs};
+`
+
+const StockText = styled.p`
+    opacity: 0.8;
+    margin-top: 0;
+`
+
 function ProductDetail({ user }) {
     const { id } = useParams()
     const [product, setProduct] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
-    const [message, setMessage] = useState()
+    const [addedMessage, setAddedMessage] = useState('')
 
     const navigate = useNavigate()
 
@@ -18,7 +68,6 @@ function ProductDetail({ user }) {
                 })
 
                 const data = await response.json()
-
                 if (!response.ok)
                     throw new Error(data.error || 'Failed to fetch product')
 
@@ -29,15 +78,17 @@ function ProductDetail({ user }) {
                 setLoading(false)
             }
         }
+
         fetchProduct()
     }, [id])
 
     const addToCart = async () => {
         if (!user) {
-            const redirectTo = `/products/${id}`
-            navigate(`/login?next=${encodeURIComponent(redirectTo)}`)
+            navigate(`/login?next=${encodeURIComponent(`/products/${id}`)}`)
             return
         }
+
+        setAddedMessage('Adding to cart...')
 
         try {
             const response = await fetch('/api/cart/add', {
@@ -51,31 +102,74 @@ function ProductDetail({ user }) {
             if (!response.ok)
                 throw new Error(data.error || 'Failed to add to cart')
 
-            setMessage('Item added to cart') // or toast if you add one later
+            const qty =
+                data.cart.items.find(i => i.product.id === product.id)
+                    ?.quantity || 1
+
+            setAddedMessage(`Added to cart (${qty} total)`)
+
+            setTimeout(() => setAddedMessage(''), 2500)
         } catch (err) {
             setError(err.message)
         }
     }
 
-    if (loading) return <p>Loading product...</p>
-    if (error) return <p style={{ color: 'red' }}>Error: {error}</p>
-    if (!product) return <p>Product not found.</p>
-
     return (
-        <div>
-            <h2>{product.name}</h2>
-            <p>{product.description}</p>
-            <p>Price: £{product.price.toFixed(2)}</p>
-            <p>Stock: {product.stock}</p>
-            <div style={{ marginTop: '20px' }}>
-                <button onClick={addToCart}>Add to Cart</button>
-            </div>
-            <div style={{ marginTop: '20px' }}>
-                <Link to="/products">
-                    <button>Back to Products</button>
-                </Link>
-            </div>
-        </div>
+        <Container>
+            <PageHeader>Product Details</PageHeader>
+
+            <MessageContainer>
+                {loading && <p>Loading product...</p>}
+                {error && <ErrorMessage>{error}</ErrorMessage>}
+                {addedMessage && (
+                    <SuccessMessage>{addedMessage}</SuccessMessage>
+                )}
+            </MessageContainer>
+
+            {!loading && !error && product && (
+                <Section size="lg">
+                    <Card>
+                        <CardBody>
+                            <ImageWrapper>
+                                <img
+                                    src={productImages[product.id]}
+                                    alt={product.name}
+                                />
+                            </ImageWrapper>
+
+                            <CardTitle>{product.name}</CardTitle>
+
+                            <PriceBox>£{product.price.toFixed(2)}</PriceBox>
+
+                            <CardSeparator />
+
+                            <Description>{product.description}</Description>
+                            <StockText>Stock: {product.stock}</StockText>
+
+                            <Section size="md">
+                                <Button
+                                    onClick={addToCart}
+                                    disabled={addedMessage}
+                                    fullwidth
+                                >
+                                    {addedMessage
+                                        ? 'Item Added'
+                                        : 'Add to Cart'}
+                                </Button>
+                            </Section>
+
+                            <Section size="sm">
+                                <Link to="/products">
+                                    <Button variant="secondary" fullwidth>
+                                        Back to Products
+                                    </Button>
+                                </Link>
+                            </Section>
+                        </CardBody>
+                    </Card>
+                </Section>
+            )}
+        </Container>
     )
 }
 

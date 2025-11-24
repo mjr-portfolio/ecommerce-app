@@ -1,11 +1,27 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 
+import useIsMobile from '../hook/useIsMobile'
+
+import Container from '../components/Container'
+import PageHeader from '../components/ui/PageHeader'
+import Section from '../components/ui/Section'
+import Button from '../components/ui/Button'
+import ButtonRow from '../components/ui/ButtonRow'
+import MessageContainer from '../components/ui/MessageContainer'
+import ErrorMessage from '../components/ui/ErrorMessage'
+
+import OrderSummaryCard from '../components/orders/OrderSummaryCard'
+import OrderItemRow from '../components/orders/OrderItemRow'
+import OrderTotals from '../components/orders/OrderTotals'
+
 function OrderDetail() {
     const { id } = useParams()
     const [order, setOrder] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+
+    const isMobile = useIsMobile()
 
     useEffect(() => {
         const fetchOrder = async () => {
@@ -29,58 +45,81 @@ function OrderDetail() {
         fetchOrder()
     }, [id])
 
-    if (loading) return <p>Loading order...</p>
-
-    if (error) return <p style={{ color: 'red' }}>Error: {error}</p>
-
-    if (!order) return <p>Order not found.</p>
-
-    const total = order.items.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0
-    )
+    const total =
+        order?.items?.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+        ) || 0
 
     return (
-        <div>
-            <h2>Order #{order.id}</h2>
-            <p>Status: {order.status}</p>
-            <p>Date: {new Date(order.created_at).toLocaleString()}</p>
+        <Container>
+            <PageHeader>Order Details</PageHeader>
 
-            <h3>Items</h3>
+            <MessageContainer>
+                {loading && <p>Loading order...</p>}
+                {error && <ErrorMessage>{error}</ErrorMessage>}
+            </MessageContainer>
 
-            {order.items.map(item => (
-                <div
-                    key={item.id}
-                    style={{
-                        borderBottom: '1px solid #ddd',
-                        padding: '10px 0',
-                        marginBottom: '10px',
-                    }}
-                >
-                    <h4>{item.product.name}</h4>
-                    <p>Qty: {item.quantity}</p>
-                    <p>Price: £{item.price.toFixed(2)}</p>
-                    <p>
-                        Product Total: £
-                        {(item.price * item.quantity).toFixed(2)}
-                    </p>
-                </div>
-            ))}
+            {!loading && !error && !order && (
+                <Section>
+                    <p>Order not found.</p>
+                </Section>
+            )}
 
-            <h3>Total: £{total.toFixed(2)}</h3>
+            {!loading && !error && order && (
+                <>
+                    <Section size="md">
+                        <OrderSummaryCard
+                            id={order.id}
+                            status={order.status}
+                            date={order.created_at}
+                        />
+                    </Section>
 
-            <div style={{ marginTop: '20px' }}>
-                <Link to="/orders">
-                    <button style={{ marginRight: '10px' }}>
-                        Back to Orders
-                    </button>
-                </Link>
+                    <Section size="md">
+                        {order.items.map(item => (
+                            <OrderItemRow key={item.id} item={item} />
+                        ))}
+                    </Section>
 
-                <Link to="/products">
-                    <button>Continue Shopping</button>
-                </Link>
-            </div>
-        </div>
+                    <Section size="md">
+                        <OrderTotals
+                            subtotal={total}
+                            total={total}
+                            shipping="Free"
+                        />
+                    </Section>
+
+                    <Section size="md">
+                        {isMobile ? (
+                            <ButtonRow>
+                                <Link to="/products">
+                                    <Button fullwidth>Continue Shopping</Button>
+                                </Link>
+
+                                <Link to="/orders">
+                                    <Button fullwidth variant="secondary">
+                                        Back to Orders
+                                    </Button>
+                                </Link>
+                            </ButtonRow>
+                        ) : (
+                            <ButtonRow>
+                                <Link to="/orders">
+                                    <Button variant="secondary">
+                                        Back to Orders
+                                    </Button>
+                                </Link>
+
+                                <Link to="/products">
+                                    <Button>Continue Shopping</Button>
+                                </Link>
+                            </ButtonRow>
+                        )}
+                    </Section>
+                </>
+            )}
+        </Container>
     )
 }
 

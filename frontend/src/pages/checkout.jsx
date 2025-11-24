@@ -1,14 +1,29 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
+import useIsMobile from '../hook/useIsMobile'
+
+import Container from '../components/Container'
+import PageHeader from '../components/ui/PageHeader'
+import Section from '../components/ui/Section'
+import Button from '../components/ui/Button'
+import ButtonRow from '../components/ui/ButtonRow'
+import MessageContainer from '../components/ui/MessageContainer'
+import ErrorMessage from '../components/ui/ErrorMessage'
+
+import OrderSummaryCard from '../components/orders/OrderSummaryCard'
+import OrderItemRow from '../components/orders/OrderItemRow'
+import OrderTotals from '../components/orders/OrderTotals'
+
 function Checkout() {
     const [cart, setCart] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [confirming, setConfirming] = useState(false)
-    const navigate = useNavigate()
 
-    // Fetch cart on load
+    const navigate = useNavigate()
+    const isMobile = useIsMobile()
+
     useEffect(() => {
         const fetchCart = async () => {
             try {
@@ -31,10 +46,8 @@ function Checkout() {
         fetchCart()
     }, [])
 
-    // Confirm checkout
     const handleCheckout = async () => {
         setConfirming(true)
-
         try {
             const response = await fetch('/api/cart/checkout', {
                 method: 'POST',
@@ -44,7 +57,6 @@ function Checkout() {
             const data = await response.json()
             if (!response.ok) throw new Error(data.error || 'Checkout failed')
 
-            // Redirect to the order complete screen
             navigate('/order-complete')
         } catch (err) {
             setError(err.message)
@@ -53,58 +65,93 @@ function Checkout() {
         }
     }
 
-    if (loading) return <p>Loading checkout...</p>
-
-    if (error) return <p style={{ color: 'red' }}>Error: {error}</p>
-
-    if (!cart || cart.items.length === 0)
-        return (
-            <div>
-                <h2>Checkout</h2>
-                <p>Your cart is empty.</p>
-            </div>
-        )
-
-    const total = cart.items.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0
-    )
+    const total =
+        cart?.items?.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+        ) || 0
 
     return (
-        <div>
-            <h2>Checkout</h2>
+        <Container>
+            <PageHeader>Checkout</PageHeader>
 
-            <h3>Order Summary</h3>
+            <MessageContainer>
+                {loading && <p>Loading...</p>}
+                {error && <ErrorMessage>{error}</ErrorMessage>}
+            </MessageContainer>
 
-            {cart.items.map(item => (
-                <div
-                    key={item.id}
-                    style={{
-                        borderBottom: '1px solid #ddd',
-                        padding: '10px 0',
-                        marginBottom: '10px',
-                    }}
-                >
-                    <h4>{item.product.name}</h4>
-                    <p>Qty: {item.quantity}</p>
-                    <p>Price: £{item.price.toFixed(2)}</p>
-                    <p>
-                        Product Total: £
-                        {(item.price * item.quantity).toFixed(2)}
-                    </p>
-                </div>
-            ))}
+            {!loading && !error && cart?.items?.length === 0 && (
+                <Section>
+                    <p>Your cart is empty.</p>
+                </Section>
+            )}
 
-            <h3>Total: £{total.toFixed(2)}</h3>
+            {!loading && !error && cart?.items?.length > 0 && (
+                <>
+                    <Section size="md">
+                        <OrderSummaryCard
+                            checkout={true}
+                            date={new Date()}
+                            status={`${cart.items.length} Items`}
+                        />
+                    </Section>
 
-            <Link to="/cart">
-                <button>Back to Cart</button>
-            </Link>
+                    <Section size="md">
+                        {cart.items.map(item => (
+                            <OrderItemRow key={item.id} item={item} />
+                        ))}
+                    </Section>
 
-            <button onClick={handleCheckout} disabled={confirming}>
-                {confirming ? 'Processing...' : 'Confirm Order'}
-            </button>
-        </div>
+                    <Section size="md">
+                        <OrderTotals
+                            subtotal={total}
+                            total={total}
+                            shipping="Free"
+                        />
+                    </Section>
+
+                    <Section size="md">
+                        {isMobile ? (
+                            <ButtonRow $justify="end">
+                                <Button
+                                    onClick={handleCheckout}
+                                    disabled={confirming}
+                                    size="lg"
+                                >
+                                    {confirming
+                                        ? 'Processing...'
+                                        : 'Confirm Order'}
+                                </Button>
+
+                                <Link to="/cart">
+                                    <Button fullwidth variant="secondary">
+                                        Back to Cart
+                                    </Button>
+                                </Link>
+                            </ButtonRow>
+                        ) : (
+                            <ButtonRow $justify="end">
+                                <Link to="/cart">
+                                    <Button variant="secondary">
+                                        Back to Cart
+                                    </Button>
+                                </Link>
+
+                                <Button
+                                    onClick={handleCheckout}
+                                    disabled={confirming}
+                                    size="lg"
+                                >
+                                    {confirming
+                                        ? 'Processing...'
+                                        : 'Confirm Order'}
+                                </Button>
+                            </ButtonRow>
+                        )}
+                    </Section>
+                </>
+            )}
+        </Container>
     )
 }
 
