@@ -25,7 +25,6 @@ def get_cart_item_or_404(cart_id, item_id, user_id):
     return item
 
 
-# Get current user's cart
 @cart_bp.route('/', methods=['GET'])
 @login_required
 def get_cart():
@@ -33,7 +32,6 @@ def get_cart():
     return jsonify(cart.to_dict()), 200
 
 
-# Add product to cart
 @cart_bp.route('/add', methods=['POST'])
 @login_required
 def add_to_cart():
@@ -57,7 +55,6 @@ def add_to_cart():
     return jsonify({"message": "Item added to cart", "cart": cart.to_dict()}), 200
 
 
-# Update quantity
 @cart_bp.route('/update/<int:item_id>', methods=['PUT'])
 @login_required
 def update_cart_item(item_id):
@@ -72,7 +69,6 @@ def update_cart_item(item_id):
     return jsonify({"message": "Cart updated", "cart": item.cart.to_dict()}), 200
 
 
-# Remove item
 @cart_bp.route('/remove/<int:item_id>', methods=['DELETE'])
 @login_required
 def remove_item(item_id):
@@ -84,7 +80,6 @@ def remove_item(item_id):
     return jsonify({"message": "Item removed", "cart": item.cart.to_dict()}), 200
 
 
-# Clear cart
 @cart_bp.route('/clear', methods=['DELETE'])
 @login_required
 def clear_cart():
@@ -101,19 +96,19 @@ def clear_cart():
 @cart_bp.route('/checkout', methods=['POST'])
 @login_required
 def checkout():
-    # Step 1: Get or create user's open cart
+    # Get or create user's open cart
     cart = get_or_create_cart(current_user.id)
 
-    # Step 2: Validate cart has items
+    # Validate cart has items
     if not cart.items:
         return jsonify({"error": "Cart is empty"}), 400
 
-    # Step 3: Create new order
+    # Create new order
     order = Order(user_id=current_user.id, status="completed")
     db.session.add(order)
     db.session.commit()  # commit early to generate order.id
 
-    # Step 4: Copy each cart item → order item
+    # Copy each cart item → order item
     for cart_item in cart.items:
         order_item = OrderItem(
             order_id=order.id,
@@ -123,10 +118,10 @@ def checkout():
         )
         db.session.add(order_item)
 
-    # Step 5: Mark cart as checked out
+    # Mark cart as checked out
     cart.status = "checked_out"
 
-    # Step 6: Clear cart items
+    # Clear cart items
     db.session.query(CartItem).filter_by(cart_id=cart.id).delete()
 
     # Save all changes

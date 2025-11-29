@@ -1,8 +1,6 @@
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { productImages } from '../../utils/productImages'
-
 import Button from './Button'
 import {
     ProductCard,
@@ -22,7 +20,10 @@ export default function CarouselCard({ product }) {
         <CarouselCardWrapper>
             <ProductCard>
                 <ProductImage>
-                    <img src={productImages[product.id]} alt={product.name} />
+                    <img
+                        src={product.image_url || '/placeholder.png'}
+                        alt={product.name}
+                    />
                 </ProductImage>
 
                 <ProductTitle>{product.name}</ProductTitle>

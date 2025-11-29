@@ -10,12 +10,14 @@ import Button from '../components/ui/Button'
 import ButtonRow from '../components/ui/ButtonRow'
 import MessageContainer from '../components/ui/MessageContainer'
 import ErrorMessage from '../components/ui/ErrorMessage'
+import LoadingMessage from '../components/ui/LoadingMessage'
+import TextCenter from '../components/ui/TextCenter'
 
 import OrderSummaryCard from '../components/orders/OrderSummaryCard'
 import OrderItemRow from '../components/orders/OrderItemRow'
 import OrderTotals from '../components/orders/OrderTotals'
 
-function OrderDetail() {
+export default function OrderDetail() {
     const { id } = useParams()
     const [order, setOrder] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -56,13 +58,13 @@ function OrderDetail() {
             <PageHeader>Order Details</PageHeader>
 
             <MessageContainer>
-                {loading && <p>Loading order...</p>}
+                {loading && <LoadingMessage>Loading Order...</LoadingMessage>}
                 {error && <ErrorMessage>{error}</ErrorMessage>}
             </MessageContainer>
 
             {!loading && !error && !order && (
                 <Section>
-                    <p>Order not found.</p>
+                    <TextCenter>Order not found.</TextCenter>
                 </Section>
             )}
 
@@ -122,5 +124,3 @@ function OrderDetail() {
         </Container>
     )
 }
-
-export default OrderDetail

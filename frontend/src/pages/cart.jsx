@@ -8,6 +8,7 @@ import PageHeader from '../components/ui/PageHeader'
 import Section from '../components/ui/Section'
 import MessageContainer from '../components/ui/MessageContainer'
 import ErrorMessage from '../components/ui/ErrorMessage'
+import LoadingMessage from '../components/ui/LoadingMessage'
 import Button from '../components/ui/Button'
 import ButtonRow from '../components/ui/ButtonRow'
 import TextCenter from '../components/ui/TextCenter'
@@ -15,7 +16,7 @@ import TextCenter from '../components/ui/TextCenter'
 import CartItemRow from '../components/cart/CartItemRow'
 import OrderTotals from '../components/orders/OrderTotals'
 
-function Cart() {
+export default function Cart() {
     const [cart, setCart] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
@@ -112,7 +113,7 @@ function Cart() {
             <PageHeader>Your Cart</PageHeader>
 
             <MessageContainer>
-                {loading && <p>Loading cart...</p>}
+                {loading && <LoadingMessage>Loading Cart...</LoadingMessage>}
                 {error && <ErrorMessage>{error}</ErrorMessage>}
             </MessageContainer>
 
@@ -195,5 +196,3 @@ function Cart() {
         </Container>
     )
 }
-
-export default Cart

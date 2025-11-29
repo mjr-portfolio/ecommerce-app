@@ -1,7 +1,6 @@
 from app import create_app, db
 from app.models import Product
 
-# Initialise the app context
 app = create_app()
 
 sample_products = [
@@ -68,7 +67,7 @@ sample_products = [
 ]
 
 with app.app_context():
-    db.session.query(Product).delete() # Can delete all products first or just add to - choosing to delete for a clean db to test with
+    db.session.query(Product).delete()
     db.session.commit()
 
     # Add new products

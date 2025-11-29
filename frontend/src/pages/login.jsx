@@ -5,6 +5,7 @@ import Container from '../components/Container'
 import PageHeader from '../components/ui/PageHeader'
 import MessageContainer from '../components/ui/MessageContainer'
 import ErrorMessage from '../components/ui/ErrorMessage'
+import LoadingMessage from '../components/ui/LoadingMessage'
 import Button from '../components/ui/Button'
 import TextCenter from '../components/ui/TextCenter'
 
@@ -17,7 +18,7 @@ import {
 } from '../components/ui/Form'
 import Section from '../components/ui/Section'
 
-function Login({ onLoginSuccess, user }) {
+export default function Login({ onLoginSuccess, user }) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
@@ -41,7 +42,10 @@ function Login({ onLoginSuccess, user }) {
 
         if (loggingIn.current) return
 
-        if (user) navigate('/profile')
+        if (user) {
+            if (user.is_admin) navigate('/admin')
+            else navigate('/profile')
+        }
     }, [user])
 
     const handleLogin = async e => {
@@ -65,7 +69,11 @@ function Login({ onLoginSuccess, user }) {
             loggingIn.current = true
             onLoginSuccess(data.user)
 
-            navigate(redirectTo)
+            if (data.user.is_admin && !searchParams.get('next')) {
+                navigate('/admin')
+            } else {
+                navigate(redirectTo)
+            }
         } catch (err) {
             setError(err.message || 'Network error')
         } finally {
@@ -78,7 +86,7 @@ function Login({ onLoginSuccess, user }) {
             <PageHeader>Login</PageHeader>
 
             <MessageContainer>
-                {loading && <p>Loading...</p>}
+                {loading && <LoadingMessage>Loading...</LoadingMessage>}
                 {error && <ErrorMessage>{error}</ErrorMessage>}
             </MessageContainer>
 
@@ -121,5 +129,3 @@ function Login({ onLoginSuccess, user }) {
         </Container>
     )
 }
-
-export default Login

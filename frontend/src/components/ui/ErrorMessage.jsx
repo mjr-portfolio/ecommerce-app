@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
 const ErrorMessage = styled.p`
-    color: ${({ theme }) => theme.colors.danger};
+    color: ${({ theme }) => theme.text.danger};
     margin: ${({ theme }) => theme.spacing.sm} 0;
     font-size: ${({ theme }) => theme.fontSizes.sm};
     font-weight: 600;

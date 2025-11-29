@@ -7,6 +7,7 @@ import Container from '../components/Container'
 import PageHeader from '../components/ui/PageHeader'
 import MessageContainer from '../components/ui/MessageContainer'
 import ErrorMessage from '../components/ui/ErrorMessage'
+import LoadingMessage from '../components/ui/LoadingMessage'
 import Button from '../components/ui/Button'
 import Section from '../components/ui/Section'
 import ButtonRow from '../components/ui/ButtonRow'
@@ -15,7 +16,7 @@ import Avatar from '../components/ui/Avatar'
 
 import { Card, CardBody, CardTitle, CardSubtitle } from '../components/ui/Card'
 
-function Profile({ user, setUser }) {
+export default function Profile({ user, setUser }) {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
 
@@ -57,7 +58,7 @@ function Profile({ user, setUser }) {
             <PageHeader>My Account</PageHeader>
 
             <MessageContainer>
-                {loading && <p>Loading profile...</p>}
+                {loading && <LoadingMessage>Loading Profile...</LoadingMessage>}
                 {error && <ErrorMessage>{error}</ErrorMessage>}
             </MessageContainer>
 
@@ -68,7 +69,7 @@ function Profile({ user, setUser }) {
                             <Avatar>{user.name?.[0]?.toUpperCase()}</Avatar>
 
                             <TextCenter>
-                                <CardTitle>{user.name}</CardTitle>
+                                <CardTitle $center>{user.name}</CardTitle>
                                 <CardSubtitle>{user.email}</CardSubtitle>
                             </TextCenter>
 
@@ -84,9 +85,23 @@ function Profile({ user, setUser }) {
                             <Section size="lg">
                                 {isMobile ? (
                                     <ButtonRow $justify="center">
-                                        <Link to="/orders">
-                                            <Button fullwidth>My Orders</Button>
-                                        </Link>
+                                        {user?.is_admin ? (
+                                            <Button
+                                                fullwidth
+                                                as={Link}
+                                                to="/admin"
+                                            >
+                                                Go to Admin Dashboard
+                                            </Button>
+                                        ) : (
+                                            <Button
+                                                fullwidth
+                                                as={Link}
+                                                to="/orders"
+                                            >
+                                                My Orders
+                                            </Button>
+                                        )}
 
                                         <Button
                                             fullwidth
@@ -101,9 +116,19 @@ function Profile({ user, setUser }) {
                                     </ButtonRow>
                                 ) : (
                                     <ButtonRow $justify="center">
-                                        <Link to="/orders">
-                                            <Button size="lg">My Orders</Button>
-                                        </Link>
+                                        {user?.is_admin ? (
+                                            <Button as={Link} to="/admin">
+                                                Go to Admin Dashboard
+                                            </Button>
+                                        ) : (
+                                            <Button
+                                                size="lg"
+                                                as={Link}
+                                                to="/orders"
+                                            >
+                                                My Orders
+                                            </Button>
+                                        )}
 
                                         <Button
                                             variant="secondary"
@@ -136,5 +161,3 @@ function Profile({ user, setUser }) {
         </Container>
     )
 }
-
-export default Profile

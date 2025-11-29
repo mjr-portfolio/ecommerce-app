@@ -18,7 +18,7 @@ const CardBase = styled.div`
     box-shadow: ${({ theme }) => theme.shadow.card};
 `
 
-function OrderComplete() {
+export default function OrderComplete() {
     return (
         <Container>
             <CardBase>
@@ -46,5 +46,3 @@ function OrderComplete() {
         </Container>
     )
 }
-
-export default OrderComplete

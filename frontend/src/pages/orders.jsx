@@ -7,6 +7,8 @@ import Section from '../components/ui/Section'
 import Button from '../components/ui/Button'
 import MessageContainer from '../components/ui/MessageContainer'
 import ErrorMessage from '../components/ui/ErrorMessage'
+import LoadingMessage from '../components/ui/LoadingMessage'
+import TextCenter from '../components/ui/TextCenter'
 import {
     OrderCard,
     OrderHeader,
@@ -16,7 +18,7 @@ import {
     OrderFooter,
 } from '../components/ui/OrderCard'
 
-function Orders() {
+export default function Orders() {
     const [orders, setOrders] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
@@ -77,16 +79,18 @@ function Orders() {
             <PageHeader>Your Orders</PageHeader>
 
             <MessageContainer>
-                {loading && <p>Loading orders...</p>}
+                {loading && <LoadingMessage>Loading Orders...</LoadingMessage>}
                 {error && <ErrorMessage>{error}</ErrorMessage>}
             </MessageContainer>
 
             {!loading && !error && orders.length === 0 && (
                 <Section size="lg">
-                    <p>You haven’t placed any orders yet.</p>
-                    <Link to="/products">
-                        <Button>Start Shopping</Button>
-                    </Link>
+                    <TextCenter>
+                        <p>You haven’t placed any orders yet.</p>
+                        <Link to="/products">
+                            <Button>Browse Products</Button>
+                        </Link>
+                    </TextCenter>
                 </Section>
             )}
 
@@ -96,5 +100,3 @@ function Orders() {
         </Container>
     )
 }
-
-export default Orders

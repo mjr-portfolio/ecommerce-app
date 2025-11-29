@@ -37,6 +37,24 @@ export const FormInput = styled.input`
     }
 `
 
+export const FormTextArea = styled.textarea`
+    padding: ${({ theme }) => theme.spacing.sm};
+    border-radius: ${({ theme }) => theme.radius.sm};
+    border: 1px solid ${({ theme }) => theme.colors.border};
+    background: ${({ theme }) => theme.colors.card};
+    color: ${({ theme }) => theme.text.primary};
+    font-size: 1rem;
+    width: 100%;
+    min-height: 90px;
+    resize: vertical;
+
+    &:focus {
+        outline: none;
+        border-color: ${({ theme }) => theme.colors.primary};
+        box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary}40;
+    }
+`
+
 export const FormError = styled.p`
     color: ${({ theme }) => theme.text.error};
     font-size: 0.9rem;

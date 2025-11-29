@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import { useState } from 'react'
 
 import useIsMobile from '../hook/useIsMobile'
@@ -8,10 +8,20 @@ import Container from './Container'
 import ThemeToggle from './ui/ThemeToggle'
 
 const NavWrapper = styled.nav`
-    background: ${({ theme }) => theme.colors.card};
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    width: 100%;
+    backdrop-filter: blur(10px);
+    background: ${({ theme }) =>
+        theme.mode === 'light'
+            ? 'rgba(236, 239, 244, 0.85)'
+            : 'rgba(46, 52, 64, 0.75)'};
     border-bottom: 1px solid ${({ theme }) => theme.colors.border};
-    margin-bottom: ${({ theme }) => theme.spacing.lg};
-    position: relative;
+    padding: 12px 0;
+
+    display: flex;
+    justify-content: center;
 `
 
 const NavInner = styled(Container)`
@@ -27,20 +37,31 @@ const NavInner = styled(Container)`
 
 const NavGroup = styled.div`
     display: flex;
-    gap: ${({ theme }) => theme.spacing.md};
+    gap: ${({ theme }) => theme.spacing.lg};
+    align-items: center;
 
     @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
         display: none;
     }
 `
 
-const NavLink = styled(Link)`
-    color: ${({ theme }) => theme.text.primary};
-    text-decoration: none;
+const NavLinkStyled = styled(NavLink)`
+    padding: ${({ theme }) => `${theme.spacing.sm} ${theme.spacing.md}`};
+    border-radius: 8px;
     font-weight: 500;
+    text-decoration: none;
+    color: ${({ theme }) => theme.text.primary};
+    transition: background 0.2s ease, color 0.2s ease;
+
+    &.active {
+        background: ${({ theme }) => theme.colors.secondary};
+        color: ${({ theme }) => theme.text.primary};
+        font-weight: 600;
+    }
 
     &:hover {
-        color: ${({ theme }) => theme.colors.primary};
+        background: ${({ theme }) => theme.colors.secondaryHover};
+        text-decoration: none;
     }
 `
 
@@ -111,12 +132,12 @@ export default function Navbar({ user, toggleTheme, theme }) {
         <NavWrapper>
             <NavInner>
                 <NavGroup>
-                    <NavLink to="/">Home</NavLink>
-                    <NavLink to="/products">Products</NavLink>
+                    <NavLinkStyled to="/">Home</NavLinkStyled>
+                    <NavLinkStyled to="/products">Products</NavLinkStyled>
                     {user && (
                         <>
-                            <NavLink to="/cart">Cart</NavLink>
-                            <NavLink to="/orders">Orders</NavLink>
+                            <NavLinkStyled to="/cart">Cart</NavLinkStyled>
+                            <NavLinkStyled to="/orders">Orders</NavLinkStyled>
                         </>
                     )}
                 </NavGroup>
@@ -129,14 +150,16 @@ export default function Navbar({ user, toggleTheme, theme }) {
 
                     {!user ? (
                         <>
-                            <NavLink to="/login">Login</NavLink>
-                            <NavLink to="/register">Register</NavLink>
+                            <NavLinkStyled to="/login">Login</NavLinkStyled>
+                            <NavLinkStyled to="/register">
+                                Register
+                            </NavLinkStyled>
                         </>
                     ) : (
                         <>
-                            <NavLink to="/profile">
+                            <NavLinkStyled to="/profile">
                                 {user.name || 'Profile'}
-                            </NavLink>
+                            </NavLinkStyled>
                         </>
                     )}
                 </NavGroup>

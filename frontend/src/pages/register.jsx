@@ -5,6 +5,7 @@ import Container from '../components/Container'
 import PageHeader from '../components/ui/PageHeader'
 import MessageContainer from '../components/ui/MessageContainer'
 import ErrorMessage from '../components/ui/ErrorMessage'
+import LoadingMessage from '../components/ui/LoadingMessage'
 import Button from '../components/ui/Button'
 import TextCenter from '../components/ui/TextCenter'
 import Section from '../components/ui/Section'
@@ -17,7 +18,7 @@ import {
     FormActions,
 } from '../components/ui/Form'
 
-function Register({ onLoginSuccess, user }) {
+export default function Register({ onLoginSuccess, user }) {
     const [email, setEmail] = useState('')
     const [name, setName] = useState('')
     const [password, setPassword] = useState('')
@@ -76,7 +77,7 @@ function Register({ onLoginSuccess, user }) {
             <PageHeader>Register</PageHeader>
 
             <MessageContainer>
-                {loading && <p>Loading...</p>}
+                {loading && <LoadingMessage>Loading...</LoadingMessage>}
                 {error && <ErrorMessage>{error}</ErrorMessage>}
             </MessageContainer>
 
@@ -129,5 +130,3 @@ function Register({ onLoginSuccess, user }) {
         </Container>
     )
 }
-
-export default Register

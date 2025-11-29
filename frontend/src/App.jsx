@@ -9,21 +9,30 @@ import Register from './pages/Register'
 import Profile from './pages/Profile'
 import Products from './pages/Products'
 import ProductDetail from './pages/ProductDetail'
-import Cart from './pages/cart'
-import Checkout from './pages/checkout'
+import Cart from './pages/Cart'
+import Checkout from './pages/Checkout'
 import OrderComplete from './pages/OrderComplete'
 import Orders from './pages/Orders'
 import OrderDetail from './pages/OrderDetail'
 import Home from './pages/Home'
 
+import LoadingMessage from './components/ui/LoadingMessage'
 import MessageContainer from './components/ui/MessageContainer'
 import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
+import AdminRoute from './components/AdminRoute'
 
-function App() {
+import AdminHome from './pages/admin/AdminHome'
+import AdminProducts from './pages/admin/AdminProducts'
+import AdminProductNew from './pages/admin/AdminProductNew'
+import AdminProductEdit from './pages/admin/AdminProductEdit'
+import AdminOrders from './pages/admin/AdminOrders'
+import AdminOrderDetail from './pages/admin/AdminOrderDetail'
+
+export default function App() {
     const storedTheme = localStorage.getItem('themeMode')
     const [theme, setTheme] = useState(
-        storedTheme === 'dark' ? darkTheme : lightTheme
+        storedTheme === 'light' ? lightTheme : darkTheme
     )
     const [user, setUser] = useState(() => {
         const storedUser = localStorage.getItem('user')
@@ -149,17 +158,70 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
+
+                <Route
+                    path="/admin"
+                    element={
+                        <AdminRoute user={user}>
+                            <AdminHome />
+                        </AdminRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/products"
+                    element={
+                        <AdminRoute user={user}>
+                            <AdminProducts />
+                        </AdminRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/products/new"
+                    element={
+                        <AdminRoute user={user}>
+                            <AdminProductNew />
+                        </AdminRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/products/:id/edit"
+                    element={
+                        <AdminRoute user={user}>
+                            <AdminProductEdit />
+                        </AdminRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/orders"
+                    element={
+                        <AdminRoute user={user}>
+                            <AdminOrders />
+                        </AdminRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/orders/:id"
+                    element={
+                        <AdminRoute user={user}>
+                            <AdminOrderDetail />
+                        </AdminRoute>
+                    }
+                />
+
                 {/* Default route */}
                 <Route path="*" element={<Home />} />
             </Routes>
 
             {checkingSession && (
                 <MessageContainer>
-                    <p>Checking session…</p>
+                    <LoadingMessage>Checking Session...</LoadingMessage>
                 </MessageContainer>
             )}
         </ThemeProvider>
     )
 }
-
-export default App

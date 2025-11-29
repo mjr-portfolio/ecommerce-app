@@ -1,13 +1,12 @@
 import styled from 'styled-components'
 
 const PageHeader = styled.h2`
-    font-size: ${({ theme }) => theme.fontSizes.xl};
-    margin-bottom: ${({ theme }) => theme.spacing.lg};
+    font-size: ${({ theme }) => theme.fontSizes.xxl};
+    margin-bottom: calc(${({ theme }) => theme.spacing.lg} * 1.2);
     color: ${({ theme }) => theme.text.primary};
     font-weight: 600;
-    line-height: 1.3;
     text-align: center;
-    justify-content: center;
+    line-height: 1.25;
 `
 
 export default PageHeader

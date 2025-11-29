@@ -6,7 +6,6 @@ from flask_login import login_user, logout_user, login_required, current_user
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
-# --- Registration ---
 @auth_bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -28,16 +27,8 @@ def register():
 
     login_user(new_user)
 
-    return jsonify({
-        'user': {
-            'id': new_user.id,
-            'email': new_user.email,
-            'name': new_user.name,
-            'created_at': new_user.created_at.isoformat()
-        }
-    }), 201
+    return jsonify({ 'user': new_user.to_dict() }), 201
 
-# --- Login ---
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -51,16 +42,8 @@ def login():
 
     login_user(user)
 
-    return jsonify({
-        'user': {
-            'id': user.id,
-            'email': user.email,
-            'name': user.name,
-            'created_at': user.created_at.isoformat()
-        }
-    }), 200
+    return jsonify({ 'user': user.to_dict() }), 200
 
-# --- Logout ---
 @auth_bp.route('/logout', methods=['POST'])
 @login_required
 def logout():
@@ -69,19 +52,10 @@ def logout():
     return jsonify({'message': 'User logged out successfully'}), 200
 
 
-# ----------------------------
 # Current User Route (for testing)
-# ----------------------------
 @auth_bp.route('/me', methods=['GET'])
 @login_required
 def me():
-    return jsonify({
-        'user': {
-            'id': current_user.id,
-            'email': current_user.email,
-            'name': current_user.name,
-            'created_at': current_user.created_at.isoformat()
-        }
-    }), 200
+    return jsonify({'user': current_user.to_dict()}), 200
 
 

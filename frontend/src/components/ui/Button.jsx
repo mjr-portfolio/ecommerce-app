@@ -9,9 +9,9 @@ const StyledButton = styled.button`
             : '0.75em 1.25em'};
     font-size: ${({ theme }) => theme.fontSizes.base};
     border-radius: ${({ theme }) => theme.radius.md};
-    border: none;
     cursor: pointer;
     font-weight: 500;
+    text-align: center;
 
     background: ${({ theme, $variant }) =>
         $variant === 'danger'
@@ -24,11 +24,15 @@ const StyledButton = styled.button`
         $variant === 'secondary' ? theme.text.primary : '#fff'};
 
     border: ${({ theme, $variant }) =>
-        $variant === 'secondary' ? `1px solid ${theme.colors.border}` : 'none'};
+        $variant === 'secondary'
+            ? `1px solid ${theme.colors.secondaryBorder}`
+            : 'none'};
 
-    transition: all 0.2s ease;
+    transition: filter 0.15s ease, transform 0.15s ease;
 
     &:hover {
+        filter: brightness(1.07);
+        transform: translateY(-1px);
         background: ${({ theme, $variant }) =>
             $variant === 'danger'
                 ? theme.colors.dangerHover

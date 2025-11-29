@@ -25,12 +25,14 @@ def create_app():
     from app.routes.product_routes import product_bp
     from app.routes.cart_routes import cart_bp
     from app.routes.order_routes import order_bp
+    from app.routes.admin_routes import admin_bp
 
     # Register blueprints
     app.register_blueprint(auth_bp)
     app.register_blueprint(product_bp)
     app.register_blueprint(cart_bp)
     app.register_blueprint(order_bp)
+    app.register_blueprint(admin_bp)
 
     @app.route('/')
     def index():

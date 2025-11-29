@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import { productImages } from '../utils/productImages'
-
 import Container from '../components/Container'
 import PageHeader from '../components/ui/PageHeader'
 import MessageContainer from '../components/ui/MessageContainer'
 import ErrorMessage from '../components/ui/ErrorMessage'
+import LoadingMessage from '../components/ui/LoadingMessage'
 import Grid from '../components/ui/Grid'
 import Button from '../components/ui/Button'
 import Section from '../components/ui/Section'
@@ -18,7 +17,7 @@ import {
     ProductFooter,
 } from '../components/ui/ProductCard'
 
-function Products() {
+export default function Products() {
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
@@ -26,9 +25,7 @@ function Products() {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await fetch('/api/products', {
-                    credentials: 'include',
-                })
+                const response = await fetch('/api/products')
 
                 const data = await response.json()
 
@@ -51,7 +48,9 @@ function Products() {
             <PageHeader>Products</PageHeader>
 
             <MessageContainer>
-                {loading && <p>Loading products...</p>}
+                {loading && (
+                    <LoadingMessage>Loading Products...</LoadingMessage>
+                )}
                 {error && <ErrorMessage>{error}</ErrorMessage>}
             </MessageContainer>
 
@@ -70,7 +69,9 @@ function Products() {
                         <ProductCard key={product.id}>
                             <ProductImage>
                                 <img
-                                    src={productImages[product.id]}
+                                    src={
+                                        product.image_url || '/placeholder.png'
+                                    }
                                     alt={product.name}
                                 />
                             </ProductImage>
@@ -94,5 +95,3 @@ function Products() {
         </Container>
     )
 }
-
-export default Products

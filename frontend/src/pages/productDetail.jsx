@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 
-import { productImages } from '../utils/productImages'
-
 import Container from '../components/Container'
 import { Card, CardBody, CardTitle, CardSeparator } from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import PageHeader from '../components/ui/PageHeader'
 import ErrorMessage from '../components/ui/ErrorMessage'
+import LoadingMessage from '../components/ui/LoadingMessage'
 import SuccessMessage from '../components/ui/SuccessMessage'
 import MessageContainer from '../components/ui/MessageContainer'
 import Section from '../components/ui/Section'
@@ -18,6 +17,7 @@ const ImageWrapper = styled.div`
     width: 100%;
     height: ${({ theme }) => theme.imageHeights.productDetail.desktop};
     border-radius: ${({ theme }) => theme.radius.md};
+    margin-bottom: ${({ theme }) => theme.spacing.md};
     overflow: hidden;
 
     img {
@@ -51,7 +51,7 @@ const StockText = styled.p`
     margin-top: 0;
 `
 
-function ProductDetail({ user }) {
+export default function ProductDetail({ user }) {
     const { id } = useParams()
     const [product, setProduct] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -119,7 +119,7 @@ function ProductDetail({ user }) {
             <PageHeader>Product Details</PageHeader>
 
             <MessageContainer>
-                {loading && <p>Loading product...</p>}
+                {loading && <LoadingMessage>Loading Product...</LoadingMessage>}
                 {error && <ErrorMessage>{error}</ErrorMessage>}
                 {addedMessage && (
                     <SuccessMessage>{addedMessage}</SuccessMessage>
@@ -132,7 +132,9 @@ function ProductDetail({ user }) {
                         <CardBody>
                             <ImageWrapper>
                                 <img
-                                    src={productImages[product.id]}
+                                    src={
+                                        product.image_url || '/placeholder.png'
+                                    }
                                     alt={product.name}
                                 />
                             </ImageWrapper>
@@ -172,5 +174,3 @@ function ProductDetail({ user }) {
         </Container>
     )
 }
-
-export default ProductDetail

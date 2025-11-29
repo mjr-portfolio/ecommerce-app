@@ -8,9 +8,11 @@ export const GlobalStyles = createGlobalStyle`
     }
 
     body {
+        margin: 0;
+        min-height: 100vh;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
             Helvetica, Arial, sans-serif;
-        background: ${({ theme }) => theme.colors.background};
+        background: ${({ theme }) => theme.colors.backgroundGradient};
         color: ${({ theme }) => theme.text.primary};
         line-height: 1.6;
     }

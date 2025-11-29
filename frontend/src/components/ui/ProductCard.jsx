@@ -10,6 +10,12 @@ export const ProductCard = styled.div`
     display: flex;
     flex-direction: column;
     height: 100%;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(46, 52, 64, 0.15);
+    }
 `
 
 export const ProductImage = styled.div`

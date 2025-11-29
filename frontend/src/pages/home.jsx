@@ -19,7 +19,7 @@ const SectionHeader = styled.h3`
     font-weight: 600;
 `
 
-function Home({ user }) {
+export default function Home({ user }) {
     const [products, setProducts] = useState([])
     const [loadingProducts, setLoadingProducts] = useState(true)
     const carouselRef = useRef(null)
@@ -228,5 +228,3 @@ function Home({ user }) {
         </Container>
     )
 }
-
-export default Home

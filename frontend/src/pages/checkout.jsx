@@ -10,12 +10,14 @@ import Button from '../components/ui/Button'
 import ButtonRow from '../components/ui/ButtonRow'
 import MessageContainer from '../components/ui/MessageContainer'
 import ErrorMessage from '../components/ui/ErrorMessage'
+import LoadingMessage from '../components/ui/LoadingMessage'
+import TextCenter from '../components/ui/TextCenter'
 
 import OrderSummaryCard from '../components/orders/OrderSummaryCard'
 import OrderItemRow from '../components/orders/OrderItemRow'
 import OrderTotals from '../components/orders/OrderTotals'
 
-function Checkout() {
+export default function Checkout() {
     const [cart, setCart] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
@@ -76,13 +78,13 @@ function Checkout() {
             <PageHeader>Checkout</PageHeader>
 
             <MessageContainer>
-                {loading && <p>Loading...</p>}
+                {loading && <LoadingMessage>Loading...</LoadingMessage>}
                 {error && <ErrorMessage>{error}</ErrorMessage>}
             </MessageContainer>
 
             {!loading && !error && cart?.items?.length === 0 && (
                 <Section>
-                    <p>Your cart is empty.</p>
+                    <TextCenter>Your cart is empty.</TextCenter>
                 </Section>
             )}
 
@@ -154,5 +156,3 @@ function Checkout() {
         </Container>
     )
 }
-
-export default Checkout
