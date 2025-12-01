@@ -6,7 +6,7 @@ from app.models import Order
 order_bp = Blueprint('orders', __name__, url_prefix='/api/orders')
 
 
-@order_bp.route('/', methods=['GET'])
+@order_bp.route('', methods=['GET'])
 @login_required
 def get_orders():
     orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.created_at.desc()).all()

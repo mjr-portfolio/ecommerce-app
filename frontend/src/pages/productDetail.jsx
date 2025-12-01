@@ -51,7 +51,7 @@ const StockText = styled.p`
     margin-top: 0;
 `
 
-export default function ProductDetail({ user }) {
+export default function ProductDetail({ user, fetchCartCount }) {
     const { id } = useParams()
     const [product, setProduct] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -63,12 +63,12 @@ export default function ProductDetail({ user }) {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const response = await fetch(`/api/products/${id}`, {
+                const res = await fetch(`/api/products/${id}`, {
                     credentials: 'include',
                 })
 
-                const data = await response.json()
-                if (!response.ok)
+                const data = await res.json()
+                if (!res.ok)
                     throw new Error(data.error || 'Failed to fetch product')
 
                 setProduct(data)
@@ -91,16 +91,15 @@ export default function ProductDetail({ user }) {
         setAddedMessage('Adding to cart...')
 
         try {
-            const response = await fetch('/api/cart/add', {
+            const res = await fetch('/api/cart/add', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify({ product_id: product.id, quantity: 1 }),
             })
 
-            const data = await response.json()
-            if (!response.ok)
-                throw new Error(data.error || 'Failed to add to cart')
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Failed to add to cart')
 
             const qty =
                 data.cart.items.find(i => i.product.id === product.id)
@@ -109,6 +108,8 @@ export default function ProductDetail({ user }) {
             setAddedMessage(`Added to cart (${qty} total)`)
 
             setTimeout(() => setAddedMessage(''), 2500)
+
+            if (fetchCartCount) await fetchCartCount()
         } catch (err) {
             setError(err.message)
         }

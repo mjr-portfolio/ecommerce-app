@@ -55,16 +55,16 @@ export default function Login({ onLoginSuccess, user }) {
         setError('')
 
         try {
-            const response = await fetch('/api/auth/login', {
+            const res = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify({ email, password }),
             })
 
-            const data = await response.json()
+            const data = await res.json()
 
-            if (!response.ok) throw new Error(data.error || 'Login failed')
+            if (!res.ok) throw new Error(data.error || 'Login failed')
 
             loggingIn.current = true
             onLoginSuccess(data.user)
@@ -94,8 +94,9 @@ export default function Login({ onLoginSuccess, user }) {
                 <Section>
                     <Form onSubmit={handleLogin}>
                         <FormRow>
-                            <FormLabel>Email</FormLabel>
+                            <FormLabel htmlFor="email">Email</FormLabel>
                             <FormInput
+                                id="email"
                                 type="email"
                                 value={email}
                                 onChange={e => setEmail(e.target.value)}
@@ -104,8 +105,9 @@ export default function Login({ onLoginSuccess, user }) {
                         </FormRow>
 
                         <FormRow>
-                            <FormLabel>Password</FormLabel>
+                            <FormLabel htmlFor="password">Password</FormLabel>
                             <FormInput
+                                id="password"
                                 type="password"
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}

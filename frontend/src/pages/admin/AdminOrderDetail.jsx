@@ -19,6 +19,8 @@ export default function AdminOrderDetail() {
     const [order, setOrder] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
+    const [updating, setUpdating] = useState(false)
+    const [selectedStatus, setSelectedStatus] = useState('')
 
     useEffect(() => {
         const load = async () => {
@@ -39,7 +41,13 @@ export default function AdminOrderDetail() {
         load()
     }, [id])
 
+    useEffect(() => {
+        if (order) setSelectedStatus(order.status)
+    }, [order])
+
     const handleUpdate = async () => {
+        setUpdating(true)
+
         try {
             const res = await fetch(`/api/admin/orders/${id}/status`, {
                 method: 'PUT',
@@ -48,13 +56,20 @@ export default function AdminOrderDetail() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    status: order.status,
+                    status: selectedStatus,
                 }),
             })
 
             if (!res.ok) throw new Error('Failed to update status')
+
+            setOrder(prev => ({
+                ...prev,
+                status: selectedStatus,
+            }))
         } catch (err) {
             alert(err.message)
+        } finally {
+            setUpdating(false)
         }
     }
 
@@ -108,12 +123,9 @@ export default function AdminOrderDetail() {
                             <ButtonRow $justify="center">
                                 <select
                                     style={{ padding: '0 20px' }}
-                                    value={order.status}
+                                    value={selectedStatus}
                                     onChange={e =>
-                                        setOrder({
-                                            ...order,
-                                            status: e.target.value,
-                                        })
+                                        setSelectedStatus(e.target.value)
                                     }
                                 >
                                     <option value="pending">pending</option>
@@ -125,8 +137,12 @@ export default function AdminOrderDetail() {
                                     <option value="cancelled">cancelled</option>
                                 </select>
 
-                                <Button size="sm" onClick={handleUpdate}>
-                                    Update Status
+                                <Button
+                                    size="sm"
+                                    onClick={handleUpdate}
+                                    disabled={updating}
+                                >
+                                    {updating ? 'Updating...' : 'Update Status'}
                                 </Button>
                             </ButtonRow>
                         </Section>

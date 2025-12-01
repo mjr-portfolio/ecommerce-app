@@ -28,12 +28,12 @@ export default function OrderDetail() {
     useEffect(() => {
         const fetchOrder = async () => {
             try {
-                const response = await fetch(`/api/orders/${id}`, {
+                const res = await fetch(`/api/orders/${id}`, {
                     credentials: 'include',
                 })
 
-                const data = await response.json()
-                if (!response.ok)
+                const data = await res.json()
+                if (!res.ok)
                     throw new Error(data.error || 'Failed to load order')
 
                 setOrder(data)

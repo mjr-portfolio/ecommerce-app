@@ -39,6 +39,7 @@ export default function App() {
         return storedUser ? JSON.parse(storedUser) : null
     })
     const [checkingSession, setCheckingSession] = useState(true)
+    const [cartCount, setCartCount] = useState(0)
 
     // Keeps localStorage in sync with user state
     useEffect(() => {
@@ -50,17 +51,18 @@ export default function App() {
     useEffect(() => {
         const checkSession = async () => {
             try {
-                const response = await fetch('/api/auth/me', {
+                const res = await fetch('/api/auth/me', {
                     credentials: 'include',
                 })
 
-                const data = await response.json()
+                const data = await res.json()
 
                 // Assuming consistent API contract — backend returns { user: {...} } and good backend test coverage
-                if (!response.ok)
+                if (!res.ok)
                     throw new Error(data.error || 'Failed to fetch user data')
 
                 setUser(data.user) // restore user from backend session
+                fetchCartCount()
             } catch (err) {
                 // No active session found, cleared user from state and localStorage
                 setUser(null)
@@ -73,6 +75,19 @@ export default function App() {
         else setCheckingSession(false)
     }, [])
 
+    const fetchCartCount = async () => {
+        try {
+            const res = await fetch('/api/cart/count', {
+                credentials: 'include',
+            })
+            if (!res.ok) return
+            const data = await res.json()
+            setCartCount(data.count)
+        } catch (err) {
+            setCartCount(0)
+        }
+    }
+
     const toggleTheme = () => {
         setTheme(prev => {
             const next = prev.mode === 'light' ? darkTheme : lightTheme
@@ -84,7 +99,12 @@ export default function App() {
     return (
         <ThemeProvider theme={theme}>
             <GlobalStyles />
-            <Navbar user={user} toggleTheme={toggleTheme} theme={theme} />
+            <Navbar
+                user={user}
+                cartCount={cartCount}
+                toggleTheme={toggleTheme}
+                theme={theme}
+            />
             <Routes>
                 <Route path="/" element={<Home user={user} />} />
                 <Route
@@ -108,7 +128,12 @@ export default function App() {
                 <Route path="/products" element={<Products />} />
                 <Route
                     path="/products/:id"
-                    element={<ProductDetail user={user} />}
+                    element={
+                        <ProductDetail
+                            user={user}
+                            fetchCartCount={fetchCartCount}
+                        />
+                    }
                 />
                 <Route
                     path="/profile"
@@ -122,7 +147,7 @@ export default function App() {
                     path="/cart/"
                     element={
                         <ProtectedRoute user={user}>
-                            <Cart />
+                            <Cart fetchCartCount={fetchCartCount} />
                         </ProtectedRoute>
                     }
                 />

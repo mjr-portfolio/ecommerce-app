@@ -51,16 +51,15 @@ export default function Register({ onLoginSuccess, user }) {
         setError('')
 
         try {
-            const response = await fetch('/api/auth/register', {
+            const res = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, name, password }),
             })
 
-            const data = await response.json()
+            const data = await res.json()
 
-            if (!response.ok)
-                throw new Error(data.error || 'Registration failed')
+            if (!res.ok) throw new Error(data.error || 'Registration failed')
 
             registering.current = true
             onLoginSuccess(data.user)
@@ -85,8 +84,9 @@ export default function Register({ onLoginSuccess, user }) {
                 <Section>
                     <Form onSubmit={handleRegister}>
                         <FormRow>
-                            <FormLabel>Name</FormLabel>
+                            <FormLabel htmlFor="name">Name</FormLabel>
                             <FormInput
+                                id="name"
                                 type="text"
                                 value={name}
                                 onChange={e => setName(e.target.value)}
@@ -95,8 +95,9 @@ export default function Register({ onLoginSuccess, user }) {
                         </FormRow>
 
                         <FormRow>
-                            <FormLabel>Email</FormLabel>
+                            <FormLabel htmlFor="email">Email</FormLabel>
                             <FormInput
+                                id="email"
                                 type="email"
                                 value={email}
                                 onChange={e => setEmail(e.target.value)}
@@ -105,8 +106,9 @@ export default function Register({ onLoginSuccess, user }) {
                         </FormRow>
 
                         <FormRow>
-                            <FormLabel>Password</FormLabel>
+                            <FormLabel htmlFor="password">Password</FormLabel>
                             <FormInput
+                                id="password"
                                 type="password"
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}

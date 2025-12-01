@@ -124,7 +124,17 @@ const MobileLink = styled(Link)`
     }
 `
 
-export default function Navbar({ user, toggleTheme, theme }) {
+const CartBadge = styled.span`
+    background: ${({ theme }) => theme.colors.primary};
+    color: white;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    border-radius: 999px;
+    margin-left: 6px;
+    font-weight: 600;
+`
+
+export default function Navbar({ user, cartCount, toggleTheme, theme }) {
     const [open, setOpen] = useState(false)
     const isMobile = useIsMobile()
 
@@ -136,7 +146,14 @@ export default function Navbar({ user, toggleTheme, theme }) {
                     <NavLinkStyled to="/products">Products</NavLinkStyled>
                     {user && (
                         <>
-                            <NavLinkStyled to="/cart">Cart</NavLinkStyled>
+                            <NavLinkStyled to="/cart">
+                                Cart
+                                {cartCount > 0 && (
+                                    <CartBadge data-testid="cart-badge">
+                                        {cartCount}
+                                    </CartBadge>
+                                )}
+                            </NavLinkStyled>
                             <NavLinkStyled to="/orders">Orders</NavLinkStyled>
                         </>
                     )}
@@ -188,8 +205,13 @@ export default function Navbar({ user, toggleTheme, theme }) {
 
                 {user && (
                     <>
-                        <MobileLink onClick={() => setOpen(o => !o)} to="/cart">
-                            Cart
+                        <MobileLink to="/cart" onClick={() => setOpen(o => !o)}>
+                            Cart{' '}
+                            {cartCount > 0 && (
+                                <CartBadge data-testid="cart-badge-mobile">
+                                    {cartCount}
+                                </CartBadge>
+                            )}
                         </MobileLink>
                         <MobileLink
                             onClick={() => setOpen(o => !o)}

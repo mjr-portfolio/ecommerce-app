@@ -26,12 +26,12 @@ export default function Orders() {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await fetch('/api/orders', {
+                const res = await fetch('/api/orders', {
                     credentials: 'include',
                 })
 
-                const data = await response.json()
-                if (!response.ok)
+                const data = await res.json()
+                if (!res.ok)
                     throw new Error(data.error || 'Failed to load orders')
 
                 setOrders(data)

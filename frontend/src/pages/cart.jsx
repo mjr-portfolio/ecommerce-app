@@ -16,7 +16,7 @@ import TextCenter from '../components/ui/TextCenter'
 import CartItemRow from '../components/cart/CartItemRow'
 import OrderTotals from '../components/orders/OrderTotals'
 
-export default function Cart() {
+export default function Cart({ fetchCartCount }) {
     const [cart, setCart] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
@@ -25,13 +25,12 @@ export default function Cart() {
 
     const fetchCart = async () => {
         try {
-            const response = await fetch('/api/cart', {
+            const res = await fetch('/api/cart', {
                 credentials: 'include',
             })
 
-            const data = await response.json()
-            if (!response.ok)
-                throw new Error(data.error || 'Failed to load cart')
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Failed to load cart')
 
             setCart(data)
         } catch (err) {
@@ -51,18 +50,19 @@ export default function Cart() {
 
     const updateItem = async (itemId, quantity) => {
         try {
-            const response = await fetch(`/api/cart/update/${itemId}`, {
+            const res = await fetch(`/api/cart/update/${itemId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify({ quantity }),
             })
 
-            const data = await response.json()
-            if (!response.ok)
-                throw new Error(data.error || 'Failed to update item')
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Failed to update item')
 
             setCart(data.cart)
+
+            if (fetchCartCount) await fetchCartCount()
         } catch (err) {
             setError(err.message)
         }
@@ -70,16 +70,17 @@ export default function Cart() {
 
     const removeItem = async item => {
         try {
-            const response = await fetch(`/api/cart/remove/${item.id}`, {
+            const res = await fetch(`/api/cart/remove/${item.id}`, {
                 method: 'DELETE',
                 credentials: 'include',
             })
 
-            const data = await response.json()
-            if (!response.ok)
-                throw new Error(data.error || 'Failed to remove item')
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Failed to remove item')
 
             setCart(data.cart)
+
+            if (fetchCartCount) await fetchCartCount()
         } catch (err) {
             setError(err.message)
         }
@@ -87,16 +88,17 @@ export default function Cart() {
 
     const clearCart = async () => {
         try {
-            const response = await fetch('/api/cart/clear', {
+            const res = await fetch('/api/cart/clear', {
                 method: 'DELETE',
                 credentials: 'include',
             })
 
-            const data = await response.json()
-            if (!response.ok)
-                throw new Error(data.error || 'Failed to clear cart')
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Failed to clear cart')
 
             setCart(prev => ({ ...prev, items: [] }))
+
+            if (fetchCartCount) await fetchCartCount()
         } catch (err) {
             setError(err.message)
         }

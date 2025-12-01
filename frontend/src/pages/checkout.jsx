@@ -29,12 +29,12 @@ export default function Checkout() {
     useEffect(() => {
         const fetchCart = async () => {
             try {
-                const response = await fetch('/api/cart', {
+                const res = await fetch('/api/cart', {
                     credentials: 'include',
                 })
 
-                const data = await response.json()
-                if (!response.ok)
+                const data = await res.json()
+                if (!res.ok)
                     throw new Error(data.error || 'Failed to load cart')
 
                 setCart(data)
@@ -51,13 +51,13 @@ export default function Checkout() {
     const handleCheckout = async () => {
         setConfirming(true)
         try {
-            const response = await fetch('/api/cart/checkout', {
+            const res = await fetch('/api/cart/checkout', {
                 method: 'POST',
                 credentials: 'include',
             })
 
-            const data = await response.json()
-            if (!response.ok) throw new Error(data.error || 'Checkout failed')
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Checkout failed')
 
             navigate('/order-complete')
         } catch (err) {

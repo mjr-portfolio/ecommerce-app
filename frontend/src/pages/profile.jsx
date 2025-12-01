@@ -28,14 +28,13 @@ export default function Profile({ user, setUser }) {
         setError('')
 
         try {
-            const response = await fetch('/api/auth/logout', {
+            const res = await fetch('/api/auth/logout', {
                 method: 'POST',
                 credentials: 'include',
             })
 
-            const data = await response.json()
-            if (!response.ok)
-                throw new Error(data.error || 'Failed to log out.')
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Failed to log out.')
 
             setUser(null)
             navigate('/login')

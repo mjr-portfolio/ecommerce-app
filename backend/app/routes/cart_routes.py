@@ -5,8 +5,6 @@ from app.models import Cart, CartItem, Product, Order, OrderItem
 
 cart_bp = Blueprint('cart', __name__, url_prefix='/api/cart')
 
-# Helper functions
-
 def get_or_create_cart(user_id):
     cart = Cart.query.filter_by(user_id=user_id, status="open").first()
     if not cart:
@@ -25,11 +23,19 @@ def get_cart_item_or_404(cart_id, item_id, user_id):
     return item
 
 
-@cart_bp.route('/', methods=['GET'])
+@cart_bp.route('', methods=['GET'])
 @login_required
 def get_cart():
     cart = get_or_create_cart(current_user.id)
     return jsonify(cart.to_dict()), 200
+
+
+@cart_bp.route('/count', methods=['GET'])
+@login_required
+def cart_count():
+    cart = get_or_create_cart(current_user.id)
+    count = sum(item.quantity for item in cart.items)
+    return jsonify({"count": count}), 200
 
 
 @cart_bp.route('/add', methods=['POST'])
@@ -42,17 +48,29 @@ def add_to_cart():
     product = Product.query.get_or_404(product_id)
     cart = get_or_create_cart(current_user.id)
 
-    # Could also add stock checking in here as well
-
     item = CartItem.query.filter_by(cart_id=cart.id, product_id=product.id).first()
+
     if item:
         item.quantity += quantity
-    else:
-        item = CartItem(cart_id=cart.id, product_id=product.id, quantity=quantity, price=product.price)
-        db.session.add(item)
+        db.session.commit()
+        return jsonify({
+            "message": "Item quantity updated",
+            "cart": cart.to_dict()
+        }), 200
 
+    item = CartItem(
+        cart_id=cart.id,
+        product_id=product.id,
+        quantity=quantity,
+        price=product.price
+    )
+    db.session.add(item)
     db.session.commit()
-    return jsonify({"message": "Item added to cart", "cart": cart.to_dict()}), 200
+
+    return jsonify({
+        "message": "Item added to cart",
+        "cart": cart.to_dict()
+    }), 201
 
 
 @cart_bp.route('/update/<int:item_id>', methods=['PUT'])
@@ -96,14 +114,11 @@ def clear_cart():
 @cart_bp.route('/checkout', methods=['POST'])
 @login_required
 def checkout():
-    # Get or create user's open cart
     cart = get_or_create_cart(current_user.id)
 
-    # Validate cart has items
     if not cart.items:
         return jsonify({"error": "Cart is empty"}), 400
 
-    # Create new order
     order = Order(user_id=current_user.id, status="completed")
     db.session.add(order)
     db.session.commit()  # commit early to generate order.id
@@ -118,16 +133,12 @@ def checkout():
         )
         db.session.add(order_item)
 
-    # Mark cart as checked out
     cart.status = "checked_out"
 
-    # Clear cart items
     db.session.query(CartItem).filter_by(cart_id=cart.id).delete()
-
-    # Save all changes
     db.session.commit()
 
     return jsonify({
         "message": "Order completed successfully",
         "order": order.to_dict()
-    }), 200
+    }), 201

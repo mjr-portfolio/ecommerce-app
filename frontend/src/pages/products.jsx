@@ -25,11 +25,11 @@ export default function Products() {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await fetch('/api/products')
+                const res = await fetch('/api/products')
 
-                const data = await response.json()
+                const data = await res.json()
 
-                if (!response.ok)
+                if (!res.ok)
                     throw new Error(data.error || 'Failed to fetch products')
 
                 setProducts(data)
