@@ -11,8 +11,14 @@ login_manager = LoginManager()
 
 def create_app(test_config=None):
     app = Flask(__name__)
+    
     # Load default config
     app.config.from_object('app.config.Config')
+
+    # Normalize Postgres URLs (important for production hosts)
+    uri = app.config.get("SQLALCHEMY_DATABASE_URI")
+    if uri and uri.startswith("postgres://"):
+        app.config["SQLALCHEMY_DATABASE_URI"] = uri.replace("postgres://", "postgresql://", 1)
 
     # Override with test config
     if test_config:
