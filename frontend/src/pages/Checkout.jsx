@@ -18,7 +18,7 @@ import OrderSummaryCard from '../components/orders/OrderSummaryCard'
 import OrderItemRow from '../components/orders/OrderItemRow'
 import OrderTotals from '../components/orders/OrderTotals'
 
-export default function Checkout() {
+export default function Checkout({ fetchCartCount }) {
     const [cart, setCart] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
@@ -52,6 +52,8 @@ export default function Checkout() {
             })
 
             navigate('/order-complete')
+
+            if (fetchCartCount) await fetchCartCount()
         } catch (err) {
             setError(err.message)
         } finally {

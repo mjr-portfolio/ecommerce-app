@@ -145,7 +145,7 @@ export default function App() {
                     path="/checkout"
                     element={
                         <ProtectedRoute user={user}>
-                            <Checkout />
+                            <Checkout fetchCartCount={fetchCartCount} />
                         </ProtectedRoute>
                     }
                 />
