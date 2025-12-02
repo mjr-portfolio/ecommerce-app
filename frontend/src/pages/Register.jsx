@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { api } from '../lib/api'
 
 import Container from '../components/Container'
 import PageHeader from '../components/ui/PageHeader'
@@ -51,15 +52,10 @@ export default function Register({ onLoginSuccess, user }) {
         setError('')
 
         try {
-            const res = await fetch('/api/auth/register', {
+            const data = await api('/api/auth/register', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, name, password }),
+                body: { email, name, password },
             })
-
-            const data = await res.json()
-
-            if (!res.ok) throw new Error(data.error || 'Registration failed')
 
             registering.current = true
             onLoginSuccess(data.user)

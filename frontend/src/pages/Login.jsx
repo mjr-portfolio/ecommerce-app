@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { api } from '../lib/api'
 
 import Container from '../components/Container'
 import PageHeader from '../components/ui/PageHeader'
@@ -55,16 +56,11 @@ export default function Login({ onLoginSuccess, user }) {
         setError('')
 
         try {
-            const res = await fetch('/api/auth/login', {
+            const data = await api('/api/auth/login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ email, password }),
+                body: { email, password },
+                auth: true,
             })
-
-            const data = await res.json()
-
-            if (!res.ok) throw new Error(data.error || 'Login failed')
 
             loggingIn.current = true
             onLoginSuccess(data.user)

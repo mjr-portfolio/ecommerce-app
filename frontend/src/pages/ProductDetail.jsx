@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
+import { api } from '../lib/api'
 
 import Container from '../components/Container'
 import { Card, CardBody, CardTitle, CardSeparator } from '../components/ui/Card'
@@ -63,13 +64,9 @@ export default function ProductDetail({ user, fetchCartCount }) {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const res = await fetch(`/api/products/${id}`, {
-                    credentials: 'include',
+                const data = await api(`/api/products/${id}`, {
+                    auth: true,
                 })
-
-                const data = await res.json()
-                if (!res.ok)
-                    throw new Error(data.error || 'Failed to fetch product')
 
                 setProduct(data)
             } catch (err) {
@@ -91,15 +88,11 @@ export default function ProductDetail({ user, fetchCartCount }) {
         setAddedMessage('Adding to cart...')
 
         try {
-            const res = await fetch('/api/cart/add', {
+            const data = await api('/api/cart/add', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ product_id: product.id, quantity: 1 }),
+                body: { product_id: product.id, quantity: 1 },
+                auth: true,
             })
-
-            const data = await res.json()
-            if (!res.ok) throw new Error(data.error || 'Failed to add to cart')
 
             const qty =
                 data.cart.items.find(i => i.product.id === product.id)

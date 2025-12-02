@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 
 import useIsMobile from '../hook/useIsMobile'
+import { api } from '../lib/api'
 
 import Container from '../components/Container'
 import PageHeader from '../components/ui/PageHeader'
@@ -28,13 +29,9 @@ export default function OrderDetail() {
     useEffect(() => {
         const fetchOrder = async () => {
             try {
-                const res = await fetch(`/api/orders/${id}`, {
-                    credentials: 'include',
+                const data = await api(`/api/orders/${id}`, {
+                    auth: true,
                 })
-
-                const data = await res.json()
-                if (!res.ok)
-                    throw new Error(data.error || 'Failed to load order')
 
                 setOrder(data)
             } catch (err) {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { api } from '../../lib/api'
 
 import Container from '../../components/Container'
 import PageHeader from '../../components/ui/PageHeader'
@@ -25,12 +26,10 @@ export default function AdminOrderDetail() {
     useEffect(() => {
         const load = async () => {
             try {
-                const res = await fetch(`/api/admin/orders/${id}`, {
-                    credentials: 'include',
+                const data = await api(`/api/admin/orders/${id}`, {
+                    auth: true,
                 })
-                if (!res.ok) throw new Error('Failed to load order')
 
-                const data = await res.json()
                 setOrder(data)
             } catch (err) {
                 setError(err.message)
@@ -49,18 +48,11 @@ export default function AdminOrderDetail() {
         setUpdating(true)
 
         try {
-            const res = await fetch(`/api/admin/orders/${id}/status`, {
+            await api(`/api/admin/orders/${id}/status`, {
                 method: 'PUT',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    status: selectedStatus,
-                }),
+                body: { status: selectedStatus },
+                auth: true,
             })
-
-            if (!res.ok) throw new Error('Failed to update status')
 
             setOrder(prev => ({
                 ...prev,

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { api } from '../lib/api'
 
 import Container from '../components/Container'
 import PageHeader from '../components/ui/PageHeader'
@@ -25,12 +26,7 @@ export default function Products() {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const res = await fetch('/api/products')
-
-                const data = await res.json()
-
-                if (!res.ok)
-                    throw new Error(data.error || 'Failed to fetch products')
+                const data = await api('/api/products')
 
                 setProducts(data)
             } catch (err) {

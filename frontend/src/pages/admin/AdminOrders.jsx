@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { api } from '../../lib/api'
 
 import Container from '../../components/Container'
 import PageHeader from '../../components/ui/PageHeader'
@@ -19,12 +20,8 @@ export default function AdminOrders() {
     useEffect(() => {
         const loadOrders = async () => {
             try {
-                const res = await fetch('/api/admin/orders', {
-                    credentials: 'include',
-                })
-                if (!res.ok) throw new Error('Failed to load orders')
+                const data = await api('/api/admin/orders', { auth: true })
 
-                const data = await res.json()
                 setOrders(data)
             } catch (err) {
                 setError(err.message)

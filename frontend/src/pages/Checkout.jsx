@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import useIsMobile from '../hook/useIsMobile'
+import { api } from '../lib/api'
 
 import Container from '../components/Container'
 import PageHeader from '../components/ui/PageHeader'
@@ -29,13 +30,7 @@ export default function Checkout() {
     useEffect(() => {
         const fetchCart = async () => {
             try {
-                const res = await fetch('/api/cart', {
-                    credentials: 'include',
-                })
-
-                const data = await res.json()
-                if (!res.ok)
-                    throw new Error(data.error || 'Failed to load cart')
+                const data = await api('/api/cart', { auth: true })
 
                 setCart(data)
             } catch (err) {
@@ -51,13 +46,10 @@ export default function Checkout() {
     const handleCheckout = async () => {
         setConfirming(true)
         try {
-            const res = await fetch('/api/cart/checkout', {
+            await api('/api/cart/checkout', {
                 method: 'POST',
-                credentials: 'include',
+                auth: true,
             })
-
-            const data = await res.json()
-            if (!res.ok) throw new Error(data.error || 'Checkout failed')
 
             navigate('/order-complete')
         } catch (err) {

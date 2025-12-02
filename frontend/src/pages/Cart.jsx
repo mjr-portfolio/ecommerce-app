@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import useIsMobile from '../hook/useIsMobile'
+import { api } from '../lib/api'
 
 import Container from '../components/Container'
 import PageHeader from '../components/ui/PageHeader'
@@ -25,12 +26,7 @@ export default function Cart({ fetchCartCount }) {
 
     const fetchCart = async () => {
         try {
-            const res = await fetch('/api/cart', {
-                credentials: 'include',
-            })
-
-            const data = await res.json()
-            if (!res.ok) throw new Error(data.error || 'Failed to load cart')
+            const data = await api('/api/cart', { auth: true })
 
             setCart(data)
         } catch (err) {
@@ -50,15 +46,11 @@ export default function Cart({ fetchCartCount }) {
 
     const updateItem = async (itemId, quantity) => {
         try {
-            const res = await fetch(`/api/cart/update/${itemId}`, {
+            const data = await api(`/api/cart/update/${itemId}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ quantity }),
+                body: { quantity },
+                auth: true,
             })
-
-            const data = await res.json()
-            if (!res.ok) throw new Error(data.error || 'Failed to update item')
 
             setCart(data.cart)
 
@@ -70,13 +62,10 @@ export default function Cart({ fetchCartCount }) {
 
     const removeItem = async item => {
         try {
-            const res = await fetch(`/api/cart/remove/${item.id}`, {
+            const data = await api(`/api/cart/remove/${item.id}`, {
                 method: 'DELETE',
-                credentials: 'include',
+                auth: true,
             })
-
-            const data = await res.json()
-            if (!res.ok) throw new Error(data.error || 'Failed to remove item')
 
             setCart(data.cart)
 
@@ -88,13 +77,10 @@ export default function Cart({ fetchCartCount }) {
 
     const clearCart = async () => {
         try {
-            const res = await fetch('/api/cart/clear', {
+            const data = await api(`/api/cart/clear`, {
                 method: 'DELETE',
-                credentials: 'include',
+                auth: true,
             })
-
-            const data = await res.json()
-            if (!res.ok) throw new Error(data.error || 'Failed to clear cart')
 
             setCart(prev => ({ ...prev, items: [] }))
 

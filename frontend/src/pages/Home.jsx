@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
 import useIsMobile from '../hook/useIsMobile'
+import { api } from '../lib/api'
 
 import Container from '../components/Container'
 import PageHeader from '../components/ui/PageHeader'
@@ -29,9 +30,8 @@ export default function Home({ user }) {
     useEffect(() => {
         const load = async () => {
             try {
-                const res = await fetch('/api/products')
-                const data = await res.json()
-                if (res.ok) setProducts(data.slice(0, 5))
+                const data = await api('/api/products')
+                setProducts(data.slice(0, 5))
             } catch (err) {
                 console.error('Failed to load featured products', err)
             } finally {

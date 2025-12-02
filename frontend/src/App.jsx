@@ -3,6 +3,7 @@ import { lightTheme, darkTheme } from './theme/theme'
 import { GlobalStyles } from './theme/globalStyles'
 import React, { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
+import { api } from './lib/api'
 
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -51,15 +52,7 @@ export default function App() {
     useEffect(() => {
         const checkSession = async () => {
             try {
-                const res = await fetch('/api/auth/me', {
-                    credentials: 'include',
-                })
-
-                const data = await res.json()
-
-                // Assuming consistent API contract — backend returns { user: {...} } and good backend test coverage
-                if (!res.ok)
-                    throw new Error(data.error || 'Failed to fetch user data')
+                const data = await api('/api/auth/me', { auth: true })
 
                 setUser(data.user) // restore user from backend session
                 fetchCartCount()
@@ -67,21 +60,18 @@ export default function App() {
                 // No active session found, cleared user from state and localStorage
                 setUser(null)
                 localStorage.removeItem('user')
+                console.warn('Session check failed:', err)
             } finally {
                 setCheckingSession(false)
             }
         }
-        if (user) checkSession()
-        else setCheckingSession(false)
+        checkSession()
     }, [])
 
     const fetchCartCount = async () => {
         try {
-            const res = await fetch('/api/cart/count', {
-                credentials: 'include',
-            })
-            if (!res.ok) return
-            const data = await res.json()
+            const data = await api('/api/cart/count', { auth: true })
+
             setCartCount(data.count)
         } catch (err) {
             setCartCount(0)

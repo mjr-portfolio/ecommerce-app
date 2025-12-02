@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { api } from '../../lib/api'
 
 import Container from '../../components/Container'
 import PageHeader from '../../components/ui/PageHeader'
@@ -27,13 +28,8 @@ export default function AdminProducts() {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const res = await fetch('/api/admin/products', {
-                    credentials: 'include',
-                })
+                const data = await api('/api/admin/products', { auth: true })
 
-                if (!res.ok) throw new Error('Failed to load products')
-
-                const data = await res.json()
                 setProducts(data)
             } catch (err) {
                 setError(err.message || 'Error loading products')
@@ -49,12 +45,10 @@ export default function AdminProducts() {
         if (!window.confirm('Are you sure?')) return
 
         try {
-            const res = await fetch(`/api/admin/products/${id}`, {
+            await api(`/api/admin/products/${id}`, {
                 method: 'DELETE',
-                credentials: 'include',
+                auth: true,
             })
-
-            if (!res.ok) throw new Error('Delete failed')
 
             setProducts(products.filter(p => p.id !== id))
         } catch (err) {

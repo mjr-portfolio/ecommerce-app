@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
+import { api } from '../../lib/api'
 
 import Container from '../../components/Container'
 import PageHeader from '../../components/ui/PageHeader'
@@ -23,11 +24,10 @@ export default function AdminProductEdit() {
     useEffect(() => {
         const loadProduct = async () => {
             try {
-                const res = await fetch(`/api/admin/products/${id}`, {
-                    credentials: 'include',
+                const data = await api(`/api/admin/products/${id}`, {
+                    auth: true,
                 })
-                if (!res.ok) throw new Error('Failed to load product')
-                const data = await res.json()
+
                 setProduct(data)
             } catch (err) {
                 setError(err.message)
@@ -52,14 +52,11 @@ export default function AdminProductEdit() {
         }
 
         try {
-            const res = await fetch(`/api/admin/products/${id}`, {
+            await api(`/api/admin/products/${id}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(updateData),
+                body: updateData,
+                auth: true,
             })
-
-            if (!res.ok) throw new Error('Failed to update product')
 
             navigate('/admin/products')
         } catch (err) {
@@ -70,11 +67,11 @@ export default function AdminProductEdit() {
     const handleDelete = async () => {
         if (!window.confirm('Delete this product?')) return
         try {
-            const res = await fetch(`/api/admin/products/${id}`, {
+            await api(`/api/admin/products/${id}`, {
                 method: 'DELETE',
-                credentials: 'include',
+                auth: true,
             })
-            if (!res.ok) throw new Error('Failed to delete product')
+
             navigate('/admin/products')
         } catch (err) {
             setError(err.message)

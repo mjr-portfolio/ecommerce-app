@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { api } from '../../lib/api'
 
 import Container from '../../components/Container'
 import PageHeader from '../../components/ui/PageHeader'
@@ -31,17 +32,11 @@ export default function AdminProductNew() {
         }
 
         try {
-            const res = await fetch('/api/admin/products', {
+            await api('/api/admin/products', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(productData),
+                body: productData,
+                auth: true,
             })
-
-            if (!res.ok) {
-                const data = await res.json()
-                throw new Error(data.error || 'Failed to create product')
-            }
 
             navigate('/admin/products')
         } catch (err) {

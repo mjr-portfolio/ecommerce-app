@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import useIsMobile from '../hook/useIsMobile'
+import { api } from '../lib/api'
 
 import Container from '../components/Container'
 import PageHeader from '../components/ui/PageHeader'
@@ -28,13 +29,10 @@ export default function Profile({ user, setUser }) {
         setError('')
 
         try {
-            const res = await fetch('/api/auth/logout', {
+            const data = await api('/api/auth/logout', {
                 method: 'POST',
-                credentials: 'include',
+                auth: true,
             })
-
-            const data = await res.json()
-            if (!res.ok) throw new Error(data.error || 'Failed to log out.')
 
             setUser(null)
             navigate('/login')
