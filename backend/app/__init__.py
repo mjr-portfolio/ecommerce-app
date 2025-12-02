@@ -15,8 +15,6 @@ def create_app(test_config=None):
     # Load default config
     app.config.from_object('app.config.Config')
 
-    print("RAW DB URI:", app.config.get("SQLALCHEMY_DATABASE_URI"))
-
     # Normalize Postgres URLs (important for production hosts)
     uri = app.config.get("SQLALCHEMY_DATABASE_URI")
     if uri and uri.startswith("postgres://"):

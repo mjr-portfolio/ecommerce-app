@@ -3,7 +3,7 @@ from app.models import Product
 
 app = create_app()
 
-sample_products = [
+products = [
     {
         "name": "Wireless Headphones",
         "description": "Noise-cancelling over-ear headphones with 30-hour battery life.",
@@ -71,7 +71,7 @@ with app.app_context():
     db.session.commit()
 
     # Add new products
-    db.session.add_all([Product(**p) for p in sample_products])
+    db.session.add_all([Product(**p) for p in products])
     db.session.commit()
 
-    print(f"Seeded {len(sample_products)} products successfully!")
+    print(f"Seeded {len(products)} products successfully!")
