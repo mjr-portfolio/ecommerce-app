@@ -15,21 +15,25 @@ def create_app(test_config=None):
     # Load default config
     app.config.from_object('app.config.Config')
 
+    # Override with test config
+    if test_config:
+        app.config.update(test_config)
+
     # Normalize Postgres URLs (important for production hosts)
     uri = app.config.get("SQLALCHEMY_DATABASE_URI")
     if uri and uri.startswith("postgres://"):
         app.config["SQLALCHEMY_DATABASE_URI"] = uri.replace("postgres://", "postgresql://", 1)
-
-    # Override with test config
-    if test_config:
-        app.config.update(test_config)
 
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
 
-    CORS(app, supports_credentials=True)  # allow cross-origin with cookies
+    # allow cross-origin with cookies
+    CORS(app, supports_credentials=True, origins=[
+        "https://ecommerce-app-omega-ruby.vercel.app",
+        "https://www.ecommerce-app-omega-ruby.vercel.app"
+    ])
 
     from app.routes.auth_routes import auth_bp
     from app.routes.product_routes import product_bp

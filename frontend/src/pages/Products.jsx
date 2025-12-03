@@ -26,7 +26,9 @@ export default function Products() {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const data = await api('/api/products')
+                const data = await api('/api/products', {
+                    credentials: 'include', // Instead of 'auth: true' to differ public routes from protected ones
+                })
 
                 setProducts(data)
             } catch (err) {

@@ -7,6 +7,10 @@ class Config:
     DEBUG = os.getenv("FLASK_DEBUG", "0") == "1"
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
     
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = "None"
+    
     # Prefer DATABASE_URL / SQLALCHEMY_DATABASE_URI if provided
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "SQLALCHEMY_DATABASE_URI",

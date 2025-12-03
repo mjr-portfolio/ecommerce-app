@@ -59,7 +59,6 @@ export default function Login({ onLoginSuccess, user }) {
             const data = await api('/api/auth/login', {
                 method: 'POST',
                 body: { email, password },
-                auth: true,
             })
 
             loggingIn.current = true

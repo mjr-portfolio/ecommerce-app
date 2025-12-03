@@ -30,7 +30,9 @@ export default function Home({ user }) {
     useEffect(() => {
         const load = async () => {
             try {
-                const data = await api('/api/products')
+                const data = await api('/api/products', {
+                    credentials: 'include', // Instead of 'auth: true' to differ public routes from protected ones
+                })
                 setProducts(data.slice(0, 5))
             } catch (err) {
                 console.error('Failed to load featured products', err)

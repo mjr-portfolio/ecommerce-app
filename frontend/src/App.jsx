@@ -89,153 +89,160 @@ export default function App() {
     return (
         <ThemeProvider theme={theme}>
             <GlobalStyles />
-            <Navbar
-                user={user}
-                cartCount={cartCount}
-                toggleTheme={toggleTheme}
-                theme={theme}
-            />
-            <Routes>
-                <Route path="/" element={<Home user={user} />} />
-                <Route
-                    path="/login"
-                    element={
-                        <Login
-                            onLoginSuccess={userData => setUser(userData)}
-                            user={user}
-                        />
-                    }
-                />
-                <Route
-                    path="/register"
-                    element={
-                        <Register
-                            onLoginSuccess={userData => setUser(userData)}
-                            user={user}
-                        />
-                    }
-                />
-                <Route path="/products" element={<Products />} />
-                <Route
-                    path="/products/:id"
-                    element={
-                        <ProductDetail
-                            user={user}
-                            fetchCartCount={fetchCartCount}
-                        />
-                    }
-                />
-                <Route
-                    path="/profile"
-                    element={
-                        <ProtectedRoute user={user}>
-                            <Profile user={user} setUser={setUser} />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/cart/"
-                    element={
-                        <ProtectedRoute user={user}>
-                            <Cart fetchCartCount={fetchCartCount} />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/checkout"
-                    element={
-                        <ProtectedRoute user={user}>
-                            <Checkout fetchCartCount={fetchCartCount} />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/order-complete"
-                    element={
-                        <ProtectedRoute user={user}>
-                            <OrderComplete />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/orders"
-                    element={
-                        <ProtectedRoute user={user}>
-                            <Orders />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/orders/:id"
-                    element={
-                        <ProtectedRoute user={user}>
-                            <OrderDetail />
-                        </ProtectedRoute>
-                    }
-                />
 
-                <Route
-                    path="/admin"
-                    element={
-                        <AdminRoute user={user}>
-                            <AdminHome />
-                        </AdminRoute>
-                    }
-                />
-
-                <Route
-                    path="/admin/products"
-                    element={
-                        <AdminRoute user={user}>
-                            <AdminProducts />
-                        </AdminRoute>
-                    }
-                />
-
-                <Route
-                    path="/admin/products/new"
-                    element={
-                        <AdminRoute user={user}>
-                            <AdminProductNew />
-                        </AdminRoute>
-                    }
-                />
-
-                <Route
-                    path="/admin/products/:id/edit"
-                    element={
-                        <AdminRoute user={user}>
-                            <AdminProductEdit />
-                        </AdminRoute>
-                    }
-                />
-
-                <Route
-                    path="/admin/orders"
-                    element={
-                        <AdminRoute user={user}>
-                            <AdminOrders />
-                        </AdminRoute>
-                    }
-                />
-
-                <Route
-                    path="/admin/orders/:id"
-                    element={
-                        <AdminRoute user={user}>
-                            <AdminOrderDetail />
-                        </AdminRoute>
-                    }
-                />
-
-                {/* Default route */}
-                <Route path="*" element={<Home />} />
-            </Routes>
-
-            {checkingSession && (
+            {checkingSession ? (
                 <MessageContainer>
                     <LoadingMessage>Checking Session...</LoadingMessage>
                 </MessageContainer>
+            ) : (
+                <>
+                    <Navbar
+                        user={user}
+                        cartCount={cartCount}
+                        toggleTheme={toggleTheme}
+                        theme={theme}
+                    />
+                    <Routes>
+                        <Route path="/" element={<Home user={user} />} />
+                        <Route
+                            path="/login"
+                            element={
+                                <Login
+                                    onLoginSuccess={userData =>
+                                        setUser(userData)
+                                    }
+                                    user={user}
+                                />
+                            }
+                        />
+                        <Route
+                            path="/register"
+                            element={
+                                <Register
+                                    onLoginSuccess={userData =>
+                                        setUser(userData)
+                                    }
+                                    user={user}
+                                />
+                            }
+                        />
+                        <Route path="/products" element={<Products />} />
+                        <Route
+                            path="/products/:id"
+                            element={
+                                <ProductDetail
+                                    user={user}
+                                    fetchCartCount={fetchCartCount}
+                                />
+                            }
+                        />
+                        <Route
+                            path="/profile"
+                            element={
+                                <ProtectedRoute user={user}>
+                                    <Profile user={user} setUser={setUser} />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/cart/"
+                            element={
+                                <ProtectedRoute user={user}>
+                                    <Cart fetchCartCount={fetchCartCount} />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/checkout"
+                            element={
+                                <ProtectedRoute user={user}>
+                                    <Checkout fetchCartCount={fetchCartCount} />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/order-complete"
+                            element={
+                                <ProtectedRoute user={user}>
+                                    <OrderComplete />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/orders"
+                            element={
+                                <ProtectedRoute user={user}>
+                                    <Orders />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/orders/:id"
+                            element={
+                                <ProtectedRoute user={user}>
+                                    <OrderDetail />
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        <Route
+                            path="/admin"
+                            element={
+                                <AdminRoute user={user}>
+                                    <AdminHome />
+                                </AdminRoute>
+                            }
+                        />
+
+                        <Route
+                            path="/admin/products"
+                            element={
+                                <AdminRoute user={user}>
+                                    <AdminProducts />
+                                </AdminRoute>
+                            }
+                        />
+
+                        <Route
+                            path="/admin/products/new"
+                            element={
+                                <AdminRoute user={user}>
+                                    <AdminProductNew />
+                                </AdminRoute>
+                            }
+                        />
+
+                        <Route
+                            path="/admin/products/:id/edit"
+                            element={
+                                <AdminRoute user={user}>
+                                    <AdminProductEdit />
+                                </AdminRoute>
+                            }
+                        />
+
+                        <Route
+                            path="/admin/orders"
+                            element={
+                                <AdminRoute user={user}>
+                                    <AdminOrders />
+                                </AdminRoute>
+                            }
+                        />
+
+                        <Route
+                            path="/admin/orders/:id"
+                            element={
+                                <AdminRoute user={user}>
+                                    <AdminOrderDetail />
+                                </AdminRoute>
+                            }
+                        />
+
+                        {/* Default route */}
+                        <Route path="*" element={<Home />} />
+                    </Routes>
+                </>
             )}
         </ThemeProvider>
     )

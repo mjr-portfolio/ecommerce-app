@@ -1,20 +1,26 @@
 const API = import.meta.env.VITE_API_URL
 
-// Standard request wrapper
 export async function api(
     path,
-    { method = 'GET', body = null, auth = false } = {}
+    { method = 'GET', body = null, auth = false, credentials } = {}
 ) {
     const options = {
         method,
         headers: { 'Content-Type': 'application/json' },
     }
 
-    // Only attach body if present
-    if (body) options.body = JSON.stringify(body)
+    if (body) {
+        options.body = JSON.stringify(body)
+    }
 
-    // Attach cookies automatically for authenticated routes
-    if (auth) options.credentials = 'include'
+    // If this is an authenticated route, always send cookies
+    if (auth) {
+        options.credentials = 'include'
+    }
+    // Otherwise, honour whatever was passed in manually
+    if (credentials) {
+        options.credentials = credentials // e.g. 'include', 'omit'
+    }
 
     const res = await fetch(`${API}${path}`, options)
 
