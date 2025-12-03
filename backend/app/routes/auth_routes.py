@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, make_response
 from app import db
 from app.models import User
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -19,7 +19,7 @@ def register():
     new_user = User(
         email=email,
         password_hash=generate_password_hash(password),
-        name=name
+        name=name,
     )
 
     db.session.add(new_user)
@@ -27,7 +27,9 @@ def register():
 
     login_user(new_user)
 
-    return jsonify({ 'user': new_user.to_dict() }), 201
+    resp = make_response(jsonify({'user': new_user.to_dict()}), 201)
+    return resp
+
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -42,20 +44,18 @@ def login():
 
     login_user(user)
 
-    return jsonify({ 'user': user.to_dict() }), 200
+    resp = make_response(jsonify({'user': user.to_dict()}), 200)
+    return resp
+
 
 @auth_bp.route('/logout', methods=['POST'])
 @login_required
 def logout():
     logout_user()
-
     return jsonify({'message': 'User logged out successfully'}), 200
 
 
-# Current User Route (for testing)
 @auth_bp.route('/me', methods=['GET'])
 @login_required
 def me():
     return jsonify({'user': current_user.to_dict()}), 200
-
-
