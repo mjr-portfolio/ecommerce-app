@@ -1,11 +1,12 @@
 <h1>E-Commerce Web App (React + Flask)</h1>
 
-A full-stack e-commerce demo application built as part of my software engineering portfolio.
-The app includes a React frontend (Vite + Styled Components), a Flask backend with authentication and session cookies, PostgreSQL on Railway, and deployment on Vercel.
+A fully-featured full-stack e-commerce demo built for my software engineering portfolio.
 
-This project mirrors real production patterns such as session-based auth, protected/admin routes, API organisation with blueprints, reusable UI components, and a clean frontend architecture.
+This project demonstrates a complete end-to-end e-commerce workflow using a React + Vite frontend, a Flask backend, PostgreSQL on Railway, and Vercel for deployment.
 
-🌍 Live Demo
+This project mirrors real production patterns such as session-based auth, protected/admin routes, API organisation with blueprints, reusable UI components, migrations and separation between frontend and backend layers.
+
+<h2>🌍 Live Demo</h2>
 
 Frontend (Vercel):
 https://ecommerce-app-omega-ruby.vercel.app
@@ -14,41 +15,46 @@ Backend (Railway):
 https://ecommerce-app-production-323f.up.railway.app
 
     ⚠️ Chrome Note:
-    
-    Use Firefox!
-    
-    Because of cross-site cookies + free hosting, Chrome tends to fail with persistant sessions.
-    Firefox works consistently. The project remains fully functional for portfolio demonstration.
 
-✨ Features
+    Because Vercel (frontend) and Railway (backend) use different domains, Chrome’s latest cross-site cookie rules may prevent session cookies from being     restored reliably.
+    Firefox works perfectly and is recommended.
+    More detail is included in the “Known Issues” section.
 
-👤 User Accounts
+<h2>✨ Features</h2>
+
+👤 Authentication & Accounts
 
     Register / Log in / Log out
 
-    Secure session-based authentication
+    Secure session-based auth (Flask-Login + cookies)
 
-    Persistent login across refresh
+    Persistent login across refreshes
 
     User profile page
 
-🛒 Shopping & Cart
+    Automatic redirection back to original page after login (?next=/original-page)
+
+🛒 Shopping Experience
 
     Browse products
 
     Product detail pages
 
-    Add/update/remove cart items
+    Add to cart (redirects unauthenticated users to login, then back)
 
-    Cart quantity badge in navbar
+    Update cart item quantities
 
-📦 Orders
+    Remove items
 
-    Create orders via checkout
+    Cart item count badge in navbar
+
+📦 Orders System
+
+    Checkout creates an order
 
     View order history
 
-    Order detail pages
+    View individual order details
 
 🔐 Admin Panel
 
@@ -56,20 +62,68 @@ https://ecommerce-app-production-323f.up.railway.app
 
     Create/edit/delete products
 
-    Manage orders & statuses
+    Manage orders & order statuses
 
-🎨 UI / UX
+(Fully separated from normal user routes)
+
+🎨 UX / UI
+
+    Reusable Custom components (Cards, Grids, Buttons, Sections, Inputs, Messages)
 
     Styled Components theming
 
-    Light/dark mode
+    Light / Dark mode with localStorage persistence
 
-    Reusable cards, buttons, grids, sections
+    Fully responsive layout (w/ Mobile)
 
-    Mobile-responsive layout
+    Clean, consistent spacing & typography
 
-🧪 Testing
-Backend Tests (pytest)
+<h2>🧱 Tech Stack</h2>
+
+Frontend
+
+    React (Vite)
+
+    React Router v6
+
+    Styled Components (custom theming system)
+
+    Custom reusable UI components
+
+    API helper wrapper (api())
+
+    Dark/Light mode
+
+    Vercel hosting
+
+Backend
+
+    Flask
+
+    Flask-Login (secure session cookies)
+
+    Flask-Migrate (Alembic)
+
+    SQLAlchemy ORM
+
+    PostgreSQL (Railway)
+
+    CORS configured for Vercel
+
+    Gunicorn production server
+
+DevOps
+
+    GitHub → automatic Railway + Vercel deployments
+
+    SQLite for local dev, Postgres in production
+
+    Product seeding script via Railway shell
+
+
+<h2>🧪 Testing</h2>
+
+Backend (pytest)
 
     Authentication logic
 
@@ -81,15 +135,15 @@ Backend Tests (pytest)
 
     Database models
 
-Frontend Tests (Vitest + React Testing Library)
+Frontend (Vitest + React Testing Library)
 
-    Navbar badge behaviour
+    Navbar behaviour
 
-    Protected route behaviour
+    Protected Routes
 
     Login/Register form logic
 
-📁 Project Structure
+<h2>📁 Project Structure</h2>
 
 <pre>
 ecommerce-app/
@@ -121,44 +175,64 @@ ecommerce-app/
     ├── vercel.json
 </pre>
 
-🚀 Deployment Setup
+<h2>🖼 Screenshots</h2>
+
+    Homepage
+
+    Product Grid
+
+    Product Detail
+
+    Cart
+
+    Checkout
+
+    Order History
+
+    Admin Dashboard
+
+    Admin Product Edit
+
+<h2>🚀 Deployment Setup</h2>
+
 🔧 Backend (Railway)
 
     Gunicorn entrypoint:
-
-    web: gunicorn "app:create_app()"
+        gunicorn "app:create_app()"
 
     Railway PostgreSQL database
 
-    Session cookies configured for secure cross-site usage:
-
-    SESSION_COOKIE_SECURE=True SESSION_COOKIE_HTTPONLY=True SESSION_COOKIE_SAMESITE=None
+    Production session cookies configured for secure cross-site usage:
+        SESSION_COOKIE_SECURE=True
+        SESSION_COOKIE_HTTPONLY=True
+        SESSION_COOKIE_SAMESITE=None
 
     CORS restricted to Vercel domain
 
-    Alembic migrations + product seeding
+    Alembic migrations
+    
+    Product seed script run via Railway shell
 
 🎨 Frontend (Vercel)
 
-    VITE_API_URL points to Railway backend
+    VITE_API_URL points to Railway backend URL
 
-    SPA routing fixed via vercel.json → index.html fallback
+    vercel.json ensures SPA routing (“refresh-safe pages”)
 
-    All fetches routed through a helper (api())
+    All fetches routed through a custom api() helper
 
-    Credentials included only when needed
+    Credentials included for protected routes only
 
-🔁 Redirect Handling (Next.js-style)
+🔁 Protected Route Redirects
 
-When accessing a protected route:
+    Unauthenticated users are redirected to:
 
-    User is redirected to:
     /login?next=/previous-page
 
-    After login, they are returned to the page they came from
-    (e.g., Cart → Login → Cart)
+    After logging in, they return to where they started
+    (e.g., Add-to-Cart → Login → Cart).
 
-Lighthouse Scores
+<h2>🗼 Lighthouse Scores</h2>
 
 | Category       | Score Range |
 |----------------|-------------|
@@ -167,35 +241,13 @@ Lighthouse Scores
 | Best Practices | 95–100      |
 | SEO            | 85–95       |
 
-🛠 Tech Stack
+Scores vary slightly due to:
 
-Frontend
+    Free hosting cold starts
 
-    React (Vite)
+    Railway → Vercel cross-domain latency
 
-    React Router
-
-    Styled Components
-
-    Vitest + RTL
-
-    Vercel
-
-Backend
-
-    Flask
-
-    Flask-Login
-
-    Flask-Migrate (Alembic)
-
-    SQLAlchemy
-
-    PostgreSQL (Railway)
-
-    Gunicorn
-
-🧰 Local Development
+<h2>🧰 Local Development</h2>
 
     Backend
       cd backend pip install -r requirements.txt flask run
@@ -211,35 +263,62 @@ Backend
     backend/.env
       SECRET_KEY=dev SQLALCHEMY_DATABASE_URI=sqlite:///ecommerce.db
 
-🔮 Future Improvements
+⚠️ Known Issue: Chrome Cross-Site Cookies
 
-    Search, filtering & pagination
+Chrome recently restricted third-party cookies, which affects setups where:
 
-    Stripe test checkout
+    frontend = vercel.app
+
+    backend = railway.app
+
+Because they are different domains, Chrome may block restoring the session cookie, causing:
+
+    /api/auth/me returning 401
+
+    Cart count failing to load
+
+    Session logout on refresh
+
+Firefox handles cross-site cookies correctly, so it is recommended for demos.
+
+This is a hosting/browser limitation — not a code issue.
+
+<h2>🔮 Future Improvements</h2>
+
+    Product search, filtering & pagination
 
     Dedicated image hosting
 
-    Improved mobile UI
+    More mobile UI refinements
 
-    More frontend tests
+    More frontend test coverage
 
-    Admin analytics dashboard
+    Payment provider integration
 
-✔ Final Notes
+    Stock/out-of-stock logic
+
+    Full analytics dashboard for admin
+
+    Switch to single-domain deployment or token auth to fully solve Chrome cookies
+
+    Reduce bundle size & image optimisation
+
+<h2>✔ Final Notes</h2>
 
 This project demonstrates:
 
-    Full-stack development
+    Full-stack architecture (frontend, backend, DB)
 
-    Auth, sessions, cookies
+    Secure session-based authentication
 
-    Database modelling, migrations & seeding
+    Database modelling, migrations, and seeding
 
-    Realistic admin/user flows
+    Realistic user & admin workflows
 
-    Deployment debugging (CORS, cookies, proxies)
+    Production deployments on two platforms
 
-    Clean UI patterns
+    Clean UI engineering
 
-    Building and shipping a complete application
+    Problem-solving around CORS, cookies & hosting constraints
 
+    Modern frontend patterns (reusable components, theming, routing)
