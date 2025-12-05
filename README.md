@@ -16,7 +16,9 @@ https://ecommerce-app-production-323f.up.railway.app
 
     ⚠️ Chrome Note:
 
-    Because Vercel (frontend) and Railway (backend) use different domains, Chrome’s latest cross-site cookie rules may prevent session cookies from being     restored reliably.
+    Because Vercel (frontend) and Railway (backend) use different domains,
+    Chrome’s latest cross-site cookie rules may prevent session cookies from being restored reliably.
+    
     Firefox works perfectly and is recommended.
     More detail is included in the “Known Issues” section.
 
