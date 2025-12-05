@@ -3,8 +3,7 @@
 A fully-featured full-stack e-commerce demo built for my software engineering portfolio.
 
 This project demonstrates a complete end-to-end e-commerce workflow using a React + Vite frontend, a Flask backend, PostgreSQL on Railway, and Vercel for deployment.
-
-This project mirrors real production patterns such as session-based auth, protected/admin routes, API organisation with blueprints, reusable UI components, migrations and separation between frontend and backend layers.
+It mirrors real-world engineering patterns such as session-based authentication, protected/admin routes, reusable UI components, migrations, and clean separation between frontend and backend layers.
 
 <h2>🌍 Live Demo</h2>
 
