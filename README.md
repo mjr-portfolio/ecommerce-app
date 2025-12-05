@@ -179,21 +179,29 @@ ecommerce-app/
 
 <h2>🖼 Screenshots</h2>
 
-    Homepage
+Homepage:
 
-    Product Grid
+<img src="./docs/screenshots/homepage.webp" width="600"/>
 
-    Product Detail
+Product Detail:
 
-    Cart
+<img src="./docs/screenshots/product_detail.webp" width="600"/>
 
-    Checkout
+Cart:
 
-    Order History
+<img src="./docs/screenshots/cart.webp" width="600"/>
 
-    Admin Dashboard
+Order History:
 
-    Admin Product Edit
+<img src="./docs/screenshots/orders.webp" width="600"/>
+
+Admin Product Edit:
+
+<img src="./docs/screenshots/admin_edit_product.webp" width="600"/>
+
+Admin Order Status:
+
+<img src="./docs/screenshots/admin_order_status.webp" width="600"/>
 
 <h2>🚀 Deployment Setup</h2>
 
