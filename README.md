@@ -1,9 +1,29 @@
 <h1>E-Commerce Web App (React + Flask)</h1>
 
+![React](https://img.shields.io/badge/Frontend-React-blue)
+![Flask](https://img.shields.io/badge/Backend-Flask-green)
+![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blueviolet)
+![Vercel](https://img.shields.io/badge/Deploy-Vercel-black)
+![Railway](https://img.shields.io/badge/Deploy-Railway-orange)
+
 A fully-featured full-stack e-commerce demo built for my software engineering portfolio.
 
-This project demonstrates a complete end-to-end e-commerce workflow using a React + Vite frontend, a Flask backend, PostgreSQL on Railway, and Vercel for deployment.
-It mirrors real-world engineering patterns such as session-based authentication, protected/admin routes, reusable UI components, migrations, and clean separation between frontend and backend layers.
+<h2>❓ Why I built this project</h2>
+
+I built this project to demonstrate my ability to design, implement, and deploy a complete full-stack application using modern tools.
+My goals were to showcase:
+
+- Production-style authentication with session cookies
+
+- A realistic e-commerce workflow (products → cart → checkout → orders)
+
+- Separation of user and admin features
+
+- Clean frontend architecture with reusable components
+
+- Working with cloud deployment platforms and debugging cross-domain issues
+
+This project represents the level of structure, polish, and problem-solving I bring to engineering work.
 
 <h2>🌍 Live Demo</h2>
 
@@ -27,99 +47,115 @@ https://ecommerce-app-production-323f.up.railway.app
 
     Register / Log in / Log out
 
-    Secure session-based auth (Flask-Login + cookies)
+    Secure session-based authentication (Flask-Login + cookies)
 
-    Persistent login across refreshes
+    Persistent login across refresh
 
     User profile page
 
-    Automatic redirection back to original page after login (?next=/original-page)
+    Automatic redirect back to previous page after login (?next=/original-page)
 
 🛒 Shopping Experience
 
-    Browse products
+    Browse all products
 
     Product detail pages
 
-    Add to cart (redirects unauthenticated users to login, then back)
+    Add to cart (unauthenticated users redirected to login → returned afterward)
 
-    Update cart item quantities
+    Update or remove cart items
 
-    Remove items
-
-    Cart item count badge in navbar
+    Cart item count shown in navbar
 
 📦 Orders System
 
     Checkout creates an order
 
-    View order history
+    View full order history
 
-    View individual order details
+    Detailed per-order view
 
 🔐 Admin Panel
 
-    Admin dashboard
+    Admin-only access
 
-    Create/edit/delete products
+    Create, edit, delete products
 
-    Manage orders & order statuses
+    Manage all orders & update status
 
-(Fully separated from normal user routes)
+    Separate from user-facing routes
 
 🎨 UX / UI
 
-    Reusable Custom components (Cards, Grids, Buttons, Sections, Inputs, Messages)
+    Custom reusable component system (Cards, Grids, Buttons, Forms, Messages)
 
-    Styled Components theming
+    Styled Components for consistent theme + design tokens
 
-    Light / Dark mode with localStorage persistence
+    Light/Dark mode with persistent preference
 
-    Fully responsive layout (w/ Mobile)
+    Mobile-responsive layout
 
-    Clean, consistent spacing & typography
+    Clean typography + spacing scale
 
 <h2>🧱 Tech Stack</h2>
 
 Frontend
 
-    React (Vite)
+    Framework & Routing
 
-    React Router v6
+        React (Vite)
 
-    Styled Components (custom theming system)
+        React Router v6
 
-    Custom reusable UI components
+    Styling & UI
 
-    API helper wrapper (api())
+        Styled Components (custom theme system)
 
-    Dark/Light mode
+        Reusable component library built from scratch
 
-    Vercel hosting
+    Architecture
+
+        API helper wrapper for consistent fetch logic
+
+        LocalStorage sync for user + theme state
+
+    Deployment & Tooling
+
+        Hosted on Vercel
+
+        Vitest + React Testing Library
 
 Backend
 
-    Flask
+    Framework & Auth
 
-    Flask-Login (secure session cookies)
+        Flask
 
-    Flask-Migrate (Alembic)
+        Flask-Login for secure session cookies
 
-    SQLAlchemy ORM
+    Database & Models
 
-    PostgreSQL (Railway)
+        SQLAlchemy ORM
 
-    CORS configured for Vercel
+        Flask-Migrate (Alembic) for migrations
 
-    Gunicorn production server
+        PostgreSQL (Railway)
+
+    Server & API Structure
+
+        Gunicorn for production
+
+        Organized via Blueprints
+
+        CORS configured specifically for Vercel frontend
 
 DevOps
 
-    GitHub → automatic Railway + Vercel deployments
+    GitHub → automatic deploy to Vercel + Railway
 
-    SQLite for local dev, Postgres in production
+    SQLite for local dev, PostgreSQL for production
 
-    Product seeding script via Railway shell
+    Product seeding via Railway shell
 
 
 <h2>🧪 Testing</h2>
@@ -178,29 +214,28 @@ ecommerce-app/
 
 <h2>🖼 Screenshots</h2>
 
-Homepage:
+<div align="center"><img src="./docs/screenshots/homepage.webp" width="600"/></div>
+<p align="center"><i>Homepage</i></p>
+<br>
 
-<img src="./docs/screenshots/homepage.webp" width="600"/>
+<div align="center"><img src="./docs/screenshots/product_detail.webp" width="600"/></div>
+<p align="center"><i>Product Detail</i></p>
+<br>
 
-Product Detail:
+<div align="center"><img src="./docs/screenshots/cart.webp" width="600"/></div>
+<p align="center"><i>Cart</i></p>
+<br>
 
-<img src="./docs/screenshots/product_detail.webp" width="600"/>
+<div align="center"><img src="./docs/screenshots/orders.webp" width="600"/></div>
+<p align="center"><i>Orders</i></p>
+<br>
 
-Cart:
+<div align="center"><img src="./docs/screenshots/admin_edit_product.webp" width="600"/></div>
+<p align="center"><i>Admin Product Edit</i></p>
+<br>
 
-<img src="./docs/screenshots/cart.webp" width="600"/>
-
-Order History:
-
-<img src="./docs/screenshots/orders.webp" width="600"/>
-
-Admin Product Edit:
-
-<img src="./docs/screenshots/admin_edit_product.webp" width="600"/>
-
-Admin Order Status:
-
-<img src="./docs/screenshots/admin_order_status.webp" width="600"/>
+<div align="center"><img src="./docs/screenshots/admin_order_status.webp" width="600"/></div>
+<p align="center"><i>Admin Order Status</i></p>
 
 <h2>🚀 Deployment Setup</h2>
 
@@ -258,19 +293,21 @@ Scores vary slightly due to:
 
 <h2>🧰 Local Development</h2>
 
-    Backend
-      cd backend pip install -r requirements.txt flask run
+Backend:
+
+    cd backend pip install -r requirements.txt flask run
     
-    Frontend
-      cd frontend npm install npm run dev
+Frontend:
 
-    Environment variables:
+    cd frontend npm install npm run dev
 
-    frontend/.env
-      VITE_API_URL=http://localhost:5000
+Environment variables:
 
-    backend/.env
-      SECRET_KEY=dev SQLALCHEMY_DATABASE_URI=sqlite:///ecommerce.db
+    frontend/.env:
+        VITE_API_URL=http://localhost:5000
+
+    backend/.env:
+        SECRET_KEY=dev SQLALCHEMY_DATABASE_URI=sqlite:///ecommerce.db
 
 ⚠️ Known Issue: Chrome Cross-Site Cookies
 
@@ -297,20 +334,22 @@ This is a hosting/browser limitation — not a code issue.
     Product search, filtering & pagination
 
     Dedicated image hosting
-
-    More mobile UI refinements
-
-    More frontend test coverage
-
+    
+    Additional mobile UI refinements
+    
+    Expanded frontend & backend test coverage (unit + integration tests)
+    
+    CI/CD pipeline with GitHub Actions (tests, linting, auto-deploy)
+    
     Payment provider integration
-
-    Stock/out-of-stock logic
-
-    Full analytics dashboard for admin
-
-    Switch to single-domain deployment or token auth to fully solve Chrome cookies
-
-    Reduce bundle size & image optimisation
+    
+    Stock management (low-stock warnings, out-of-stock UI)
+    
+    Admin analytics dashboard
+    
+    Single-domain deployment or token-based auth to fully resolve Chrome cookie issues
+    
+    Bundle optimisation + Lighthouse score improvements
 
 <h2>✔ Final Notes</h2>
 
