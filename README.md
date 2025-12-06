@@ -331,6 +331,12 @@ This is a hosting/browser limitation — not a code issue.
 
 <h2>🔮 Future Improvements</h2>
 
+    Standardise frontend component usage
+
+    Update navbar with dynamic routes between standard and admin users
+
+    Fix edgecase issues
+
     Product search, filtering & pagination
 
     Dedicated image hosting
@@ -339,7 +345,7 @@ This is a hosting/browser limitation — not a code issue.
     
     Expanded frontend & backend test coverage (unit + integration tests)
     
-    CI/CD pipeline with GitHub Actions (tests, linting, auto-deploy)
+    CI/CD pipeline with GitHub Actions (tests, linting, auto-deploy, staging)
     
     Payment provider integration
     
