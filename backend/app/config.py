@@ -5,7 +5,9 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     DEBUG = os.getenv("FLASK_DEBUG", "0") == "1"
-    SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
+    SECRET_KEY = os.getenv("SECRET_KEY")
+    if not SECRET_KEY:
+        raise RuntimeError("SECRET_KEY not set")
     
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True

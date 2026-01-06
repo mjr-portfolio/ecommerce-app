@@ -13,15 +13,15 @@ A fully-featured full-stack e-commerce demo built for my software engineering po
 I built this project to demonstrate my ability to design, implement, and deploy a complete full-stack application using modern tools.
 My goals were to showcase:
 
-- Production-style authentication with session cookies
+-   Production-style authentication with session cookies
 
-- A realistic e-commerce workflow (products → cart → checkout → orders)
+-   A realistic e-commerce workflow (products → cart → checkout → orders)
 
-- Separation of user and admin features
+-   Separation of user and admin features
 
-- Clean frontend architecture with reusable components
+-   Clean frontend architecture with reusable components
 
-- Working with cloud deployment platforms and debugging cross-domain issues
+-   Working with cloud deployment platforms and debugging cross-domain issues
 
 This project represents the level of structure, polish, and problem-solving I bring to engineering work.
 
@@ -37,7 +37,7 @@ https://ecommerce-app-production-323f.up.railway.app
 
     Because Vercel (frontend) and Railway (backend) use different domains,
     Chrome’s latest cross-site cookie rules may prevent session cookies from being restored reliably.
-    
+
     Firefox works perfectly and is recommended.
     More detail is included in the “Known Issues” section.
 
@@ -157,7 +157,6 @@ DevOps
 
     Product seeding via Railway shell
 
-
 <h2>🧪 Testing</h2>
 
 Backend (pytest)
@@ -254,7 +253,7 @@ ecommerce-app/
     CORS restricted to Vercel domain
 
     Alembic migrations
-    
+
     Product seed script run via Railway shell
 
 🎨 Frontend (Vercel)
@@ -279,7 +278,7 @@ ecommerce-app/
 <h2>🗼 Lighthouse Scores</h2>
 
 | Category       | Score Range |
-|----------------|-------------|
+| -------------- | ----------- |
 | Performance    | 75–90       |
 | Accessibility  | 85–100      |
 | Best Practices | 95–100      |
@@ -296,7 +295,7 @@ Scores vary slightly due to:
 Backend:
 
     cd backend pip install -r requirements.txt flask run
-    
+
 Frontend:
 
     cd frontend npm install npm run dev
@@ -306,8 +305,11 @@ Environment variables:
     frontend/.env:
         VITE_API_URL=http://localhost:5000
 
-    backend/.env:
-        SECRET_KEY=dev SQLALCHEMY_DATABASE_URI=sqlite:///ecommerce.db
+    backend/.env (local development only):
+        SECRET_KEY=dev-secret-key
+        SQLALCHEMY_DATABASE_URI=sqlite:///ecommerce.db
+
+    Production environment variables are configured via the hosting platform (Railway).
 
 ⚠️ Known Issue: Chrome Cross-Site Cookies
 
@@ -340,21 +342,21 @@ This is a hosting/browser limitation — not a code issue.
     Product search, filtering & pagination
 
     Dedicated image hosting
-    
+
     Additional mobile UI refinements
-    
+
     Expanded frontend & backend test coverage (unit + integration tests)
-    
+
     CI/CD pipeline with GitHub Actions (tests, linting, auto-deploy, staging)
-    
+
     Payment provider integration
-    
+
     Stock management (low-stock warnings, out-of-stock UI)
-    
+
     Admin analytics dashboard
-    
+
     Single-domain deployment or token-based auth to fully resolve Chrome cookie issues
-    
+
     Bundle optimisation + Lighthouse score improvements
 
 <h2>✔ Final Notes</h2>
