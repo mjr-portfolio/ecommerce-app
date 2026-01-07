@@ -12,6 +12,8 @@ class Config:
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "None"
+
+    PREFERRED_URL_SCHEME = "https"
     
     # Prefer DATABASE_URL / SQLALCHEMY_DATABASE_URI if provided
     SQLALCHEMY_DATABASE_URI = os.getenv(

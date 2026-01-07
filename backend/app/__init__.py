@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_cors import CORS
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -11,6 +12,15 @@ login_manager = LoginManager()
 
 def create_app(test_config=None):
     app = Flask(__name__)
+
+    # Fixes railway session issue, tells Flask it's behind HTTPS (Railway / Vercel)
+    app.wsgi_app = ProxyFix(
+        app.wsgi_app,
+        x_for=1,
+        x_proto=1,
+        x_host=1,
+        x_port=1,
+    )
 
     # Load default config
     app.config.from_object('app.config.Config')
