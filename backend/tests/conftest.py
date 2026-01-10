@@ -74,28 +74,42 @@ def product(app):
 
 
 @pytest.fixture()
-def user_client(client, user):
+def user_client(app, user):
     """
     Returns a test client already logged in as a normal user.
     """
 
-    client.post(
-        "/api/auth/login",
-        json={"email": user.email, "password": "password123"},
-    )
+    client = app.test_client()
+
+    res = client.post("/api/auth/login", json={
+        "email": user.email,
+        "password": "password123"
+    })
+
+    token = res.get_json()["access_token"]
+
+    # Attach token to future requests
+    client.environ_base["HTTP_AUTHORIZATION"] = f"Bearer {token}"
 
     return client
 
 
 @pytest.fixture()
-def admin_client(client, admin):
+def admin_client(app, admin):
     """
     Returns a test client already logged in as an admin.
     """
 
-    client.post(
-        "/api/auth/login",
-        json={"email": admin.email, "password": "password123"},
-    )
+    client = app.test_client()
+
+    res = client.post("/api/auth/login", json={
+        "email": admin.email,
+        "password": "password123"
+    })
+
+    token = res.get_json()["access_token"]
+
+    # Attach token to future requests
+    client.environ_base["HTTP_AUTHORIZATION"] = f"Bearer {token}"
 
     return client

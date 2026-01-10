@@ -47,18 +47,7 @@ def test_get_product_not_found(client):
 
 
 # Admin routes (create/update/delete)
-
-def login_as(client, user):
-    """Utility to log in test user via session."""
-    return client.post("/api/auth/login", json={
-        "email": user.email,
-        "password": "password123"
-    })
-
-
-def test_admin_create_product(client, admin_user):
-    login_as(client, admin_user)
-
+def test_admin_create_product(admin_client):
     payload = {
         "name": "New Product",
         "price": 12.50,
@@ -67,52 +56,47 @@ def test_admin_create_product(client, admin_user):
         "image_url": "/images/new.jpg"
     }
 
-    res = client.post("/api/admin/products", json=payload)
+    res = admin_client.post("/api/admin/products", json=payload)
     data = res.get_json()
 
     assert res.status_code == 201
     assert data["name"] == "New Product"
 
-    with client.application.app_context():
+    with admin_client.application.app_context():
         p = Product.query.filter_by(name="New Product").first()
         assert p is not None
         assert p.price == 12.50
 
 
-def test_admin_update_product(client, admin_user, product):
-    login_as(client, admin_user)
-
+def test_admin_update_product(admin_client, product):
     payload = { "name": "Updated Name" }
 
-    res = client.put(f"/api/admin/products/{product.id}", json=payload)
+    res = admin_client.put(f"/api/admin/products/{product.id}", json=payload)
     data = res.get_json()
 
     assert res.status_code == 200
     assert data["name"] == "Updated Name"
 
-    with client.application.app_context():
+    with admin_client.application.app_context():
         p = db.session.get(Product, product.id)
         assert p.name == "Updated Name"
 
 
-def test_admin_delete_product(client, admin_user, product):
-    login_as(client, admin_user)
-
-    res = client.delete(f"/api/admin/products/{product.id}")
+def test_admin_delete_product(client, admin_client, product):
+    res = admin_client.delete(f"/api/admin/products/{product.id}")
     assert res.status_code == 200
 
-    with client.application.app_context():
+    with admin_client.application.app_context():
         p = db.session.get(Product, product.id)
         assert p is None
 
 
 # Permission test
 
-def test_non_admin_cannot_create_product(client, user):
+def test_non_admin_cannot_create_product(user_client):
     """Normal users should NOT access admin endpoints."""
-    login_as(client, user)
 
-    res = client.post("/api/admin/products", json={
+    res = user_client.post("/api/admin/products", json={
         "name": "Nope",
         "price": 1,
         "stock": 1
