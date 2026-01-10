@@ -114,7 +114,12 @@ class Cart(db.Model):
     status = db.Column(db.String(20), default="open")
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
 
-    items = db.relationship("CartItem", back_populates="cart", cascade="all, delete-orphan")
+    items = db.relationship(
+        "CartItem",
+        back_populates="cart",
+        cascade="all, delete-orphan",
+        order_by="CartItem.id"
+    )
 
     def __repr__(self):
         return f"<Cart {self.id} by User {self.user_id}>"

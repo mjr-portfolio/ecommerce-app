@@ -57,10 +57,13 @@ export default function App() {
                 setUser(data.user) // restore user from backend session
                 fetchCartCount()
             } catch (err) {
-                // No active session found, cleared user from state and localStorage
-                setUser(null)
-                localStorage.removeItem('user')
-                console.warn('Session check failed:', err)
+                if (err.status === 401) {
+                    // No active session found, cleared user from state and localStorage
+                    setUser(null)
+                    localStorage.removeItem('user')
+                } else {
+                    console.warn('Session check failed:', err)
+                }
             } finally {
                 setCheckingSession(false)
             }
