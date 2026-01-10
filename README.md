@@ -11,9 +11,11 @@ A fully-featured full-stack e-commerce demo built for my software engineering po
 <h2>❓ Why I built this project</h2>
 
 I built this project to demonstrate my ability to design, implement, and deploy a complete full-stack application using modern tools.
+During development I migrated the authentication system from session cookies to JWT-based auth in order to solve real-world cross-domain deployment issues and improve reliability across browsers.
+
 My goals were to showcase:
 
--   Production-style authentication with session cookies
+-   Production-style authentication using JWT (access tokens)
 
 -   A realistic e-commerce workflow (products → cart → checkout → orders)
 
@@ -27,19 +29,13 @@ This project represents the level of structure, polish, and problem-solving I br
 
 <h2>🌍 Live Demo</h2>
 
+Note: The deployed app may take a few seconds to load on first visit due to cold starts on the hosting platform.
+
 Frontend (Vercel):
 https://ecommerce-app-omega-ruby.vercel.app
 
 Backend (Railway):
 https://ecommerce-app-production-323f.up.railway.app
-
-    ⚠️ Chrome Note:
-
-    Because Vercel (frontend) and Railway (backend) use different domains,
-    Chrome’s latest cross-site cookie rules may prevent session cookies from being restored reliably.
-
-    Firefox works perfectly and is recommended.
-    More detail is included in the “Known Issues” section.
 
 <h2>✨ Features</h2>
 
@@ -47,9 +43,11 @@ https://ecommerce-app-production-323f.up.railway.app
 
     Register / Log in / Log out
 
-    Secure session-based authentication (Flask-Login + cookies)
+    Secure JWT-based authentication (Flask-JWT-Extended)
 
-    Persistent login across refresh
+    Token persisted in localStorage for session continuity across refresh
+
+    Protected routes using backend token verification
 
     User profile page
 
@@ -131,7 +129,7 @@ Backend
 
         Flask
 
-        Flask-Login for secure session cookies
+        Flask-JWT-Extended for token-based authentication (JWT)
 
     Database & Models
 
@@ -162,6 +160,7 @@ DevOps
 Backend (pytest)
 
     Authentication logic
+        Auth tests cover JWT-protected routes and permission boundaries (user vs admin)
 
     Cart behaviour
 
@@ -245,12 +244,10 @@ ecommerce-app/
 
     Railway PostgreSQL database
 
-    Production session cookies configured for secure cross-site usage:
-        SESSION_COOKIE_SECURE=True
-        SESSION_COOKIE_HTTPONLY=True
-        SESSION_COOKIE_SAMESITE=None
+    JWT authentication configured using environment-based secret key
+        Tokens passed via Authorization header (Bearer scheme)
 
-    CORS restricted to Vercel domain
+    CORS restricted to known frontend domains
 
     Alembic migrations
 
@@ -311,25 +308,18 @@ Environment variables:
 
     Production environment variables are configured via the hosting platform (Railway).
 
-⚠️ Known Issue: Chrome Cross-Site Cookies
+⚠️ Previous Deployment Issue (Now Resolved)
 
-Chrome recently restricted third-party cookies, which affects setups where:
+    Earlier versions of this project used session cookies for authentication. When deployed across two domains (Vercel frontend and Railway backend), modern browser third-party cookie restrictions — especially in Chrome — caused inconsistent session persistence.
 
-    frontend = vercel.app
+    To solve this properly, the authentication system was refactored to use JWT-based auth with Authorization headers instead of cookies. This:
 
-    backend = railway.app
+    • Removes cross-site cookie issues
+    • Works consistently across all browsers
+    • More closely reflects real-world production APIs
+    • Simplifies frontend/backend separation
 
-Because they are different domains, Chrome may block restoring the session cookie, causing:
-
-    /api/auth/me returning 401
-
-    Cart count failing to load
-
-    Session logout on refresh
-
-Firefox handles cross-site cookies correctly, so it is recommended for demos.
-
-This is a hosting/browser limitation — not a code issue.
+    This change is reflected in the current implementation.
 
 <h2>🔮 Future Improvements</h2>
 
@@ -355,8 +345,6 @@ This is a hosting/browser limitation — not a code issue.
 
     Admin analytics dashboard
 
-    Single-domain deployment or token-based auth to fully resolve Chrome cookie issues
-
     Bundle optimisation + Lighthouse score improvements
 
 <h2>✔ Final Notes</h2>
@@ -365,7 +353,7 @@ This project demonstrates:
 
     Full-stack architecture (frontend, backend, DB)
 
-    Secure session-based authentication
+    Secure JWT-based authentication (stateless auth with protected routes)
 
     Database modelling, migrations, and seeding
 
@@ -378,3 +366,5 @@ This project demonstrates:
     Problem-solving around CORS, cookies & hosting constraints
 
     Modern frontend patterns (reusable components, theming, routing)
+
+    Refactoring a live project to resolve real deployment issues (migrating auth architecture)
