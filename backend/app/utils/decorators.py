@@ -1,12 +1,17 @@
 from functools import wraps
 from flask import abort
-from flask_login import current_user, login_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from app.models import User
 
 def admin_required(f):
     @wraps(f)
-    @login_required
+    @jwt_required()
     def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or not current_user.is_admin:
+        user_id = int(get_jwt_identity())
+        user = User.query.get(user_id)
+
+        if not user or not user.is_admin:
             abort(403)
+
         return f(*args, **kwargs)
     return decorated_function

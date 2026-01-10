@@ -88,4 +88,4 @@ def test_me_authenticated(user_client):
 
 def test_me_unauthenticated(client):
     res = client.get("/api/auth/me")
-    assert res.status_code == 401  # because @login_required
+    assert res.status_code == 401  # because @jwt_required

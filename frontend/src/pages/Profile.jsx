@@ -24,23 +24,10 @@ export default function Profile({ user, setUser }) {
     const navigate = useNavigate()
     const isMobile = useIsMobile()
 
-    const handleLogout = async () => {
-        setLoading(true)
-        setError('')
-
-        try {
-            const data = await api('/api/auth/logout', {
-                method: 'POST',
-                auth: true,
-            })
-
-            setUser(null)
-            navigate('/login')
-        } catch (err) {
-            setError(err.message || 'Network error during logout.')
-        } finally {
-            setLoading(false)
-        }
+    const handleLogout = () => {
+        localStorage.removeItem('accessToken')
+        setUser(null)
+        navigate('/login')
     }
 
     const formatDate = date =>

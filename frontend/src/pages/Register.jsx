@@ -32,34 +32,18 @@ export default function Register({ onLoginSuccess, user }) {
     const firstRender = useRef(true)
     const registering = useRef(false)
 
-    const searchParams = new URLSearchParams(location.search)
-    const redirectTo = searchParams.get('next') || '/profile'
-
-    useEffect(() => {
-        if (firstRender.current) {
-            firstRender.current = false
-            return
-        }
-
-        if (registering.current) return
-
-        if (user) navigate('/profile')
-    }, [user])
-
     const handleRegister = async e => {
         e.preventDefault()
         setLoading(true)
         setError('')
 
         try {
-            const data = await api('/api/auth/register', {
+            await api('/api/auth/register', {
                 method: 'POST',
                 body: { email, name, password },
             })
 
-            registering.current = true
-            onLoginSuccess(data.user)
-            navigate(redirectTo)
+            navigate('/login')
         } catch (err) {
             setError(err.message || 'Network error')
         } finally {

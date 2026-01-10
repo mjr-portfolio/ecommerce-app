@@ -1,19 +1,18 @@
 import os
+from datetime import timedelta
 
 # Get absolute path to the folder where config.py lives
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     DEBUG = os.getenv("FLASK_DEBUG", "0") == "1"
+
     SECRET_KEY = os.getenv("SECRET_KEY")
     if not SECRET_KEY:
         raise RuntimeError("SECRET_KEY not set")
     
-    SESSION_COOKIE_SECURE = True
-    SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = "None"
-
-    PREFERRED_URL_SCHEME = "https"
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", SECRET_KEY)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
     
     # Prefer DATABASE_URL / SQLALCHEMY_DATABASE_URI if provided
     SQLALCHEMY_DATABASE_URI = os.getenv(

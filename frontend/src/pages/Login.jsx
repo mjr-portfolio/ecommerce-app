@@ -62,6 +62,8 @@ export default function Login({ onLoginSuccess, user }) {
             })
 
             loggingIn.current = true
+
+            localStorage.setItem('accessToken', data.access_token)
             onLoginSuccess(data.user)
 
             if (data.user.is_admin && !searchParams.get('next')) {

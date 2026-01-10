@@ -2,34 +2,24 @@ const API = import.meta.env.VITE_API_URL
 
 export async function api(
     path,
-    { method = 'GET', body = null, auth = false, credentials } = {}
+    { method = 'GET', body = null, auth = false } = {}
 ) {
-    const options = {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-    }
+    const headers = { 'Content-Type': 'application/json' }
 
-    if (body) {
-        options.body = JSON.stringify(body)
-    }
-
-    // If this is an authenticated route, always send cookies
     if (auth) {
-        options.credentials = 'include'
-    }
-    // Otherwise, honour whatever was passed in manually
-    if (credentials) {
-        options.credentials = credentials // e.g. 'include', 'omit'
+        const token = localStorage.getItem('accessToken')
+        if (token) {
+            headers.Authorization = `Bearer ${token}`
+        }
     }
 
-    const res = await fetch(`${API}${path}`, options)
+    const res = await fetch(`${API}${path}`, {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : null,
+    })
 
-    let data
-    try {
-        data = await res.json()
-    } catch {
-        data = null
-    }
+    const data = await res.json().catch(() => null)
 
     if (!res.ok) {
         throw new Error(data?.error || 'Request failed')

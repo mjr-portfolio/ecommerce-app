@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
-from flask_login import login_required, current_user
 from app import db
 from app.models import Cart, CartItem, Product, Order, OrderItem
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 cart_bp = Blueprint('cart', __name__, url_prefix='/api/cart')
 
@@ -24,29 +24,33 @@ def get_cart_item_or_404(cart_id, item_id, user_id):
 
 
 @cart_bp.route('', methods=['GET'])
-@login_required
+@jwt_required()
 def get_cart():
-    cart = get_or_create_cart(current_user.id)
+    user_id = int(get_jwt_identity())
+    cart = get_or_create_cart(user_id)
     return jsonify(cart.to_dict()), 200
 
 
 @cart_bp.route('/count', methods=['GET'])
-@login_required
+@jwt_required()
 def cart_count():
-    cart = get_or_create_cart(current_user.id)
+    user_id = int(get_jwt_identity())
+    cart = get_or_create_cart(user_id)
     count = sum(item.quantity for item in cart.items)
     return jsonify({"count": count}), 200
 
 
 @cart_bp.route('/add', methods=['POST'])
-@login_required
+@jwt_required()
 def add_to_cart():
+    user_id = int(get_jwt_identity())
+
     data = request.get_json()
     product_id = data.get('product_id')
     quantity = data.get('quantity', 1)
 
     product = Product.query.get_or_404(product_id)
-    cart = get_or_create_cart(current_user.id)
+    cart = get_or_create_cart(user_id)
 
     item = CartItem.query.filter_by(cart_id=cart.id, product_id=product.id).first()
 
@@ -74,13 +78,15 @@ def add_to_cart():
 
 
 @cart_bp.route('/update/<int:item_id>', methods=['PUT'])
-@login_required
+@jwt_required()
 def update_cart_item(item_id):
+    user_id = int(get_jwt_identity())
+
     data = request.get_json()
     quantity = data.get('quantity', 1)
 
-    cart = get_or_create_cart(current_user.id)
-    item = get_cart_item_or_404(cart.id, item_id, current_user.id)
+    cart = get_or_create_cart(user_id)
+    item = get_cart_item_or_404(cart.id, item_id, user_id)
 
     item.quantity = quantity
     db.session.commit()
@@ -88,10 +94,12 @@ def update_cart_item(item_id):
 
 
 @cart_bp.route('/remove/<int:item_id>', methods=['DELETE'])
-@login_required
+@jwt_required()
 def remove_item(item_id):
-    cart = get_or_create_cart(current_user.id)
-    item = get_cart_item_or_404(cart.id, item_id, current_user.id)
+    user_id = int(get_jwt_identity())
+
+    cart = get_or_create_cart(user_id)
+    item = get_cart_item_or_404(cart.id, item_id, user_id)
 
     db.session.delete(item)
     db.session.commit()
@@ -99,9 +107,11 @@ def remove_item(item_id):
 
 
 @cart_bp.route('/clear', methods=['DELETE'])
-@login_required
+@jwt_required()
 def clear_cart():
-    cart = get_or_create_cart(current_user.id)
+    user_id = int(get_jwt_identity())
+
+    cart = get_or_create_cart(user_id)
     if not cart.items:
         return jsonify({'message': 'Cart already empty'}), 200
 
@@ -112,14 +122,16 @@ def clear_cart():
 
 # Checkout (convert cart -> order)
 @cart_bp.route('/checkout', methods=['POST'])
-@login_required
+@jwt_required()
 def checkout():
-    cart = get_or_create_cart(current_user.id)
+    user_id = int(get_jwt_identity())
+
+    cart = get_or_create_cart(user_id)
 
     if not cart.items:
         return jsonify({"error": "Cart is empty"}), 400
 
-    order = Order(user_id=current_user.id, status="completed")
+    order = Order(user_id=user_id, status="completed")
     db.session.add(order)
     db.session.commit()  # commit early to generate order.id
 

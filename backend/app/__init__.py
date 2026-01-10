@@ -2,25 +2,18 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_login import LoginManager
 from flask_cors import CORS
-from werkzeug.middleware.proxy_fix import ProxyFix
+from flask_jwt_extended import JWTManager
 
 db = SQLAlchemy()
 migrate = Migrate()
-login_manager = LoginManager()
 
 def create_app(test_config=None):
     app = Flask(__name__)
 
-    # Fixes railway session issue, tells Flask it's behind HTTPS (Railway / Vercel)
-    app.wsgi_app = ProxyFix(
-        app.wsgi_app,
-        x_for=1,
-        x_proto=1,
-        x_host=1,
-        x_port=1,
-    )
+    app.config["JWT_TOKEN_LOCATION"] = ["headers"]
+    app.config["JWT_HEADER_NAME"] = "Authorization"
+    app.config["JWT_HEADER_TYPE"] = "Bearer"
 
     # Load default config
     app.config.from_object('app.config.Config')
@@ -28,6 +21,9 @@ def create_app(test_config=None):
     # Override with test config
     if test_config:
         app.config.update(test_config)
+
+    # Init jwt after config is loaded
+    jwt = JWTManager(app)
 
     # Normalize Postgres URLs (important for production hosts)
     uri = app.config.get("SQLALCHEMY_DATABASE_URI")
@@ -37,10 +33,11 @@ def create_app(test_config=None):
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
-    login_manager.init_app(app)
 
     # allow cross-origin with cookies
     CORS(app, supports_credentials=True, origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
         "https://ecommerce-app-omega-ruby.vercel.app",
         "https://www.ecommerce-app-omega-ruby.vercel.app"
     ])
@@ -65,9 +62,5 @@ def create_app(test_config=None):
     from app import models
 
     from app.models import User  # import here to avoid circular imports
-
-    @login_manager.user_loader
-    def load_user(user_id):
-        return db.session.get(User, int(user_id))
 
     return app
