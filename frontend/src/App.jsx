@@ -39,7 +39,7 @@ export default function App() {
         const storedUser = localStorage.getItem('user')
         return storedUser ? JSON.parse(storedUser) : null
     })
-    const [checkingSession, setCheckingSession] = useState(true)
+    const [checkingAuth, setcheckingAuth] = useState(true)
     const [cartCount, setCartCount] = useState(0)
 
     // Keeps localStorage in sync with user state
@@ -48,27 +48,27 @@ export default function App() {
         else localStorage.removeItem('user')
     }, [user])
 
-    // On refresh, check if user is still logged in (session cookie)
+    // On refresh, check if user is still logged in
     useEffect(() => {
-        const checkSession = async () => {
+        const checkAuth = async () => {
             try {
                 const data = await api('/api/auth/me', { auth: true })
 
-                setUser(data.user) // restore user from backend session
+                setUser(data.user) // restore user from backend
                 fetchCartCount()
             } catch (err) {
                 if (err.status === 401) {
-                    // No active session found, cleared user from state and localStorage
+                    // No active user found, cleared user from state and localStorage
                     setUser(null)
                     localStorage.removeItem('user')
                 } else {
-                    console.warn('Session check failed:', err)
+                    console.warn('Auth check failed:', err)
                 }
             } finally {
-                setCheckingSession(false)
+                setcheckingAuth(false)
             }
         }
-        checkSession()
+        checkAuth()
     }, [])
 
     const fetchCartCount = async () => {
@@ -93,9 +93,12 @@ export default function App() {
         <ThemeProvider theme={theme}>
             <GlobalStyles />
 
-            {checkingSession ? (
+            {checkingAuth ? (
                 <MessageContainer>
-                    <LoadingMessage>Checking Session...</LoadingMessage>
+                    <LoadingMessage>
+                        Checking Auth / Waking Railway Server Up - Please
+                        wait...
+                    </LoadingMessage>
                 </MessageContainer>
             ) : (
                 <>
