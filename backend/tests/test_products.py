@@ -1,24 +1,6 @@
 import pytest
 from app import db
 from app.models import Product
-from werkzeug.security import generate_password_hash
-
-@pytest.fixture()
-def admin_user(app): # Custom product admin defined to not break other tests that may use the base admin from conftest.py
-    """Create an admin user."""
-    from app.models import User
-
-    u = User(
-        email="admin@example.com",
-        name="Admin User",
-        password_hash=generate_password_hash("password123"),
-        is_admin=True
-    )
-    db.session.add(u)
-    db.session.commit()
-    return u
-
-# -------------------------------------------------
 
 # Public routes
 
@@ -82,7 +64,7 @@ def test_admin_update_product(admin_client, product):
         assert p.name == "Updated Name"
 
 
-def test_admin_delete_product(client, admin_client, product):
+def test_admin_delete_product(admin_client, product):
     res = admin_client.delete(f"/api/admin/products/{product.id}")
     assert res.status_code == 200
 
@@ -96,10 +78,12 @@ def test_admin_delete_product(client, admin_client, product):
 def test_non_admin_cannot_create_product(user_client):
     """Normal users should NOT access admin endpoints."""
 
-    res = user_client.post("/api/admin/products", json={
+    payload = {
         "name": "Nope",
         "price": 1,
         "stock": 1
-    })
+    }
+
+    res = user_client.post("/api/admin/products", json=payload)
 
     assert res.status_code == 403

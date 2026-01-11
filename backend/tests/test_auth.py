@@ -39,7 +39,10 @@ def test_register_duplicate_email(client, user): # user passed in to call the fi
 
 
 def test_login_success(client, user):
-    payload = {"email": user.email, "password": "password123"}
+    payload = {
+        "email": user.email,
+        "password": "password123"
+    }
 
     res = client.post("/api/auth/login", json=payload)
     data = res.get_json()
@@ -50,7 +53,10 @@ def test_login_success(client, user):
 
 
 def test_login_invalid_password(client, user):
-    payload = {"email": user.email, "password": "wrongpass"}
+    payload = {
+        "email": user.email,
+        "password": "wrongpass"
+    }
 
     res = client.post("/api/auth/login", json=payload)
     data = res.get_json()
@@ -60,7 +66,10 @@ def test_login_invalid_password(client, user):
 
 
 def test_login_unknown_email(client):
-    payload = {"email": "unknown@example.com", "password": "pass"}
+    payload = {
+        "email": "unknown@example.com",
+        "password": "pass"
+    }
 
     res = client.post("/api/auth/login", json=payload)
     data = res.get_json()

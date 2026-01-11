@@ -30,6 +30,9 @@ def create_app(test_config=None):
     if uri and uri.startswith("postgres://"):
         app.config["SQLALCHEMY_DATABASE_URI"] = uri.replace("postgres://", "postgresql://", 1)
 
+    if not app.config.get("SECRET_KEY"):
+        raise RuntimeError("SECRET_KEY not set")
+
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)

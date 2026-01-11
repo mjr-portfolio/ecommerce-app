@@ -8,8 +8,6 @@ class Config:
     DEBUG = os.getenv("FLASK_DEBUG", "0") == "1"
 
     SECRET_KEY = os.getenv("SECRET_KEY")
-    if not SECRET_KEY:
-        raise RuntimeError("SECRET_KEY not set")
     
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", SECRET_KEY)
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)

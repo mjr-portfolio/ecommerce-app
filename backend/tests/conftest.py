@@ -15,6 +15,8 @@ def app():
         "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
         "SQLALCHEMY_TRACK_MODIFICATIONS": False,
         "WTF_CSRF_ENABLED": False,
+        "SECRET_KEY": "test-secret-key",
+        "JWT_SECRET_KEY": "test-jwt-secret",
     })
 
     with app.app_context():

@@ -33,12 +33,10 @@ def test_cart_count(user_client, product):
 
 
 def test_add_to_cart(user_client, user, product, app):
-    payload = {
+    res = user_client.post("/api/cart/add", json={
         "product_id": product.id,
         "quantity": 2
-    }
-
-    res = user_client.post("/api/cart/add", json=payload)
+    })
     assert res.status_code == 201
 
     with app.app_context():
