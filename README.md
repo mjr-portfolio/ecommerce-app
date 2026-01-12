@@ -29,7 +29,8 @@ This project represents the level of structure, polish, and problem-solving I br
 
 <h2>🌍 Live Demo</h2>
 
-Note: The deployed app may take up to 30 seconds to load on first visit due to cold starts on the hosting platform.
+Note: The deployed app may take up to 30 seconds to load on first visit due to cold starts on the hosting platform.<br>
+If it seems to be stuck after 20-30 seconds, refresh the page to allow it to work correctly.
 
 Frontend (Vercel):
 https://ecommerce-app-omega-ruby.vercel.app
