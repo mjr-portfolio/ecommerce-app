@@ -15,15 +15,15 @@ During development I migrated the authentication system from session cookies to 
 
 My goals were to showcase:
 
--   Production-style authentication using JWT (access tokens)
+- Production-style authentication using JWT (access tokens)
 
--   A realistic e-commerce workflow (products → cart → checkout → orders)
+- A realistic e-commerce workflow (products → cart → checkout → orders)
 
--   Separation of user and admin features
+- Separation of user and admin features
 
--   Clean frontend architecture with reusable components
+- Clean frontend architecture with reusable components
 
--   Working with cloud deployment platforms and debugging cross-domain issues
+- Working with cloud deployment platforms and debugging cross-domain issues
 
 This project represents the level of structure, polish, and problem-solving I bring to engineering work.
 
@@ -305,6 +305,7 @@ Environment variables:
 
     backend/.env (local development only):
         SECRET_KEY=dev-secret-key
+        JWT_SECRET_KEY=dev-jwt-secret
         SQLALCHEMY_DATABASE_URI=sqlite:///ecommerce.db
 
     Production environment variables are configured via the hosting platform (Railway).
